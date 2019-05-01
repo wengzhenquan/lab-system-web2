@@ -1,0 +1,29 @@
+.btn {
+  width: 80px;
+  height: 30px;
+  line-height: 15px;
+  overflow: hidden;
+  font-size: 14px;
+  background-color: #fff;
+  border-radius:18px;
+  text-align: center;
+  padding: 0;
+  -webkit-tap-highlight-color:transparent; // 去除手机端点击蓝色底色
+  &-blue{
+    color: #2d8cf0;
+    border-radius:10px;
+    border: 1px solid #2d8cf0;
+    &:hover {
+      color: #fff;
+      border: 1px solid #2d8cf0;
+      background:#2d8cf0;
+    }
+  }
+  &.btn-r-hover {
+    color: #444;
+    border-color: #444;
+    &:hover {
+      border-color: red;
+    }
+  }
+}
