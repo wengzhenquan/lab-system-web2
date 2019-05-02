@@ -63,54 +63,6 @@ export const otherRouter = {
         //     name: "addStore",
         //     component: () => import("@/views/storeManagement/storeInfo.vue")
         // },
-        // {
-        //     path: "editStore",
-        //     title: "编辑店铺",
-        //     name: "editStore",
-        //     component: () => import("@/views/storeManagement/storeInfo.vue")
-        // },
-        // {
-        //     path: "staffManagement",
-        //     title: "员工管理",
-        //     name: "staffManagement",
-        //     component: () => import("@/views/storeManagement/staffManagement.vue")
-        // },
-        // {
-        //     path: "addVideo",
-        //     title: "新增视频",
-        //     name: "addVideo",
-        //     component: () => import("@/views/operationManagement/videoDetail.vue")
-        // },
-        // {
-        //     path: "editVideo",
-        //     title: "编辑视频",
-        //     name: "editVideo",
-        //     component: () => import("@/views/operationManagement/videoDetail.vue")
-        // },
-        // {
-        //     path: "addArticle",
-        //     title: "新增文章",
-        //     name: "addArticle",
-        //     component: () => import("@/views/operationManagement/articleDetail.vue")
-        // },
-        // {
-        //     path: "editArticle",
-        //     title: "编辑文章",
-        //     name: "editArticle",
-        //     component: () => import("@/views/operationManagement/articleDetail.vue")
-        // },
-        // {
-        //     path: "addBanner",
-        //     title: "新增轮播图",
-        //     name: "addBanner",
-        //     component: () => import("@/views/operationManagement/bannerDetail.vue")
-        // },
-        // {
-        //     path: "editBanner",
-        //     title: "编辑轮播图",
-        //     name: "editBanner",
-        //     component: () => import("@/views/operationManagement/bannerDetail.vue")
-        // },
     ]
 };
 
@@ -292,7 +244,7 @@ export const appRouter = [
                 title: "使用与分配",
                 name: "useManage1",
                 access: 1,
-                component: () => import("@/views/deviceManage/useManage")
+                component: () => import("@/views/deviceManage/useManage1")
             },
             {
                 path: "repairApply",
@@ -448,75 +400,6 @@ export const appRouter = [
             },
         ]
     },
-
-    // {
-    //     path: "/orderManagement",
-    //     icon: "i iconfont icon-dingdan",
-    //     name: "orderManagement",
-    //     access: 0,
-    //     title: "订单管理",
-    //     component: Main,
-    //     children: [
-    //         {
-    //             path: "rechargeOrder",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "充值订单",
-    //             name: "rechargeOrder",
-    //             access: 0,
-    //             component: () => import("@/views/orderManagement/rechargeOrder")
-    //         },
-    //         {
-    //             path: "consumeOrder",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "消费订单",
-    //             name: "consumeOrder",
-    //             access: 0,
-    //             component: () => import("@/views/orderManagement/consumeOrder")
-    //         },
-    //     ]
-    // },
-    // {
-    //     path: "/operationManagement",
-    //     icon: "i iconfont icon-gerenhaoyunyinggongju",
-    //     name: "operationManagement",
-    //     access: 0,
-    //     title: "运营管理",
-    //     component: Main,
-    //     children: [
-    //         {
-    //             path: "videoManage",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "视频管理",
-    //             name: "videoManage",
-    //             access: 0,
-    //             component: () => import("@/views/operationManagement/index")
-    //         },
-    //         {
-    //             path: "articleManage",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "文章管理",
-    //             name: "articleManage",
-    //             access: 0,
-    //             component: () => import("@/views/operationManagement/articleManage")
-    //         },
-    //         {
-    //             path: "extensionManage",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "素材管理（推广）",
-    //             name: "extensionManage",
-    //             access: 0,
-    //             component: () => import("@/views/operationManagement/extensionManage")
-    //         },
-    //         {
-    //             path: "uploadBanner",
-    //             icon: "i iconfont icon-guanli",
-    //             title: "轮播图管理",
-    //             name: "uploadBanner",
-    //             access: 0,
-    //             component: () => import("@/views/operationManagement/uploadBanner")
-    //         },
-    //     ]
-    // },
 ];
 
 // 所有上面定义的路由都要写在下面的routers里
