@@ -1,15 +1,17 @@
 <template>
-    <div>
+    <div class="box">
         <div class="search-title">
-            <div><p>教室编号：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="numb"/></div>
-            <div><p>状态：</p>
-                <Select v-model="state" style="width: 140px;margin-top: 8px">
-                    <Option v-for="item in sortList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                </Select>
+            <div>
+                <div><p>教室编号：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="numb"/></div>
+                <div><p>状态：</p>
+                    <Select v-model="state" style="width: 140px;margin-top: 8px">
+                        <Option v-for="item in sortList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+                </div>
             </div>
+            <Button type="primary" @click="searchLab" >查询</Button>
         </div>
         <div class="user-manage">
-            <Button type="primary" @click="searchLab" >查询</Button>
             <Button type="primary" @click="isAdd = true" v-if="level === 0">添加实验室</Button>
         </div>
         <Table border ref="selection" :columns="columns4" :data="labList"></Table>
@@ -176,7 +178,7 @@
                                             // 申请实验室
                                         }
                                     }
-                                }, '申请'),
+                                }, '去申请'),
                             ]);
                         }
                     }

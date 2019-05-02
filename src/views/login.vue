@@ -1,5 +1,8 @@
  <template>
     <div class="login-box">
+      <div class="login-title">
+        <img src="../images/shiyanshixitong.png" alt="">
+      </div>
       <div class="login">
         <p>登录</p>
         <p>用户名：<Input v-model="userName" placeholder="请输入账号" style="width: 222px" /></p>
@@ -184,12 +187,19 @@
     background: url("../images/login_bg.jpg");
     background-size: 100% 100%;
     position: relative;
+    .login-title {
+      width: 50%;
+      margin: 0 auto;
+     img {
+       width: 100%;
+     }
+    }
   }
   .login {
     position: absolute;
     /*left: 38%;*/
-    right: 15%;
-    top: 20%;
+    right: 12%;
+    top: 26%;
     padding: 40px;
     border: 1px solid #fff;
     border-radius: 10px;

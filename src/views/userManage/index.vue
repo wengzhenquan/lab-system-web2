@@ -1,12 +1,14 @@
 <template>
-    <div>
+    <div class="box">
         <div class="search-title">
-            <div><p>账户：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="userName"/></div>
-            <div><p>用户名称：</p><Input style="width: 140px;margin-top: 8px" v-model="name"/></div>
-            <div><p>身份：</p><Input style="width: 140px;margin-top: 8px" v-model="identityName"/></div>
+            <div>
+                <div><p>账户：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="userName"/></div>
+                <div><p>用户名称：</p><Input style="width: 140px;margin-top: 8px" v-model="name"/></div>
+                <div><p>身份：</p><Input style="width: 140px;margin-top: 8px" v-model="identityName"/></div>
+            </div>
+            <Button type="primary" @click="searchUser">查询</Button>
         </div>
         <div class="user-manage">
-            <Button type="primary" @click="searchUser">查询</Button>
             <Button type="primary" @click="goAddUser">创建用户</Button>
         </div>
         <Table border ref="selection" :columns="columns4" :data="userInfo"></Table>

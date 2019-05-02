@@ -177,20 +177,20 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: "labIndex",
+                path: "labIndex1",
                 icon: "i iconfont icon-guanli",
                 title: "实验室管理",
-                name: "labIndex",
+                name: "labIndex1",
                 access: 1,
                 component: () => import("@/views/labManage/index")
             },
             {
-                path: "labApprovalManage",
+                path: "labApprovalManage1",
                 icon: "i iconfont icon-guanli",
                 title: "实验室申请",
-                name: "labApprovalManage",
+                name: "labApprovalManage1",
                 access: 1,
-                component: () => import("@/views/labManage/labApprovalManage")
+                component: () => import("@/views/labManage/myLabApply")
             },
         ]
     },
@@ -202,6 +202,14 @@ export const appRouter = [
         title: "设备管理",
         component: Main,
         children: [
+            {
+                path: "devSortManage",
+                icon: "i iconfont icon-guanli",
+                title: "设备分类管理",
+                name: "devSortManage",
+                access: 0,
+                component: () => import("@/views/deviceManage/devSortManage")
+            },
             {
                 path: "useManage",
                 icon: "i iconfont icon-guanli",
@@ -271,7 +279,7 @@ export const appRouter = [
         ]
     },
     {
-        path: "/deviceManage",
+        path: "/repairApply",
         icon: "i iconfont icon-my_shezhi_ico",
         name: "deviceManage",
         access: 1,
@@ -279,9 +287,17 @@ export const appRouter = [
         component: Main,
         children: [
             {
+                path: "useManage1",
+                icon: "i iconfont icon-guanli",
+                title: "使用与分配",
+                name: "useManage1",
+                access: 1,
+                component: () => import("@/views/deviceManage/useManage")
+            },
+            {
                 path: "repairApply",
                 icon: "i iconfont icon-guanli",
-                title: "报修申请",
+                title: "设备报修申请",
                 name: "repairApply",
                 access: 1,
                 component: () => import("@/views/deviceManage/repairApply")

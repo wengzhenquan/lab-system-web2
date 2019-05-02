@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="box">
         <div style="display: flex;margin-bottom: 10px;">
             <Button type="primary" style="height: 33px" @click="addIdent">添加身份</Button>
         </div>
