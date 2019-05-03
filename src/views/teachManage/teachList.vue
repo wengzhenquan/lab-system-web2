@@ -1,9 +1,12 @@
 <template>
-    <div>
-      <div class="user-manage">
-        <div ><Button type="primary" style="height: 33px;margin-bottom: 10px;" @click="isAdd = true" v-if="level === 1">添加课程</Button></div>
+    <div class="box">
+      <div class="search-title">
+        <div style="margin-left: 12px"><Button type="primary" style="height: 33px;margin-bottom: 10px;" @click="isAdd = true" v-if="level === 1">添加课程</Button></div>
       </div>
-      <div class="col">
+      <!--<div class="user-manage">-->
+        <!--<div ><Button type="primary" style="height: 33px;margin-bottom: 10px;" @click="isAdd = true" v-if="level === 1">添加课程</Button></div>-->
+      <!--</div>-->
+      <div class="col" style="margin-top: 12px">
         <Table border ref="selection" :columns="columns4" :data="courceList" v-if="level === 1"></Table>
         <Table border ref="selection" :columns="columnsS" :data="courceList" v-if="level === 3"></Table>
       </div>
@@ -234,9 +237,11 @@
         },
 
       created() {
-          this.level = this.$store.state.loginInfo.level;
+          this.level = parseInt(this.Cookies.get('access'));
           if(this.level === 1) {
-            this.formItem.teacherUserId = this.$store.state.loginInfo.userId;
+            this.formItem.teacherUserId = JSON.parse(localStorage.getItem('loginInfo')).userId;
+
+              console.log(this.formItem.teacherUserId)
           }
           this.getCourceList();
       },

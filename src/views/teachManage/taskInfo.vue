@@ -1,11 +1,16 @@
 <template>
-  <div>
+  <div  style="background-color: #fff;border-radius: 5px;padding: 12px">
     <Form :model="formItem" :label-width="80">
       <FormItem label="实验题目：">
         <Input v-model="formItem.title" readonly></Input>
       </FormItem>
       <FormItem label="实验内容：">
-        <div v-html="formItem.content" style="border: 1px solid #ccc;"></div>
+          <quill-editor
+                  v-model="formItem.content"
+                  ref="myQuillEditor"
+                  :options="editorOption"
+          >
+          </quill-editor>
       </FormItem>
       <FormItem label="课程名称：">
         <Input v-model="formItem.courseName" style="width: 187px" readonly></Input>
@@ -92,7 +97,7 @@
       //返回上一级
       goBack() {
         this.$router.push({
-          path: './experimentTask',
+          path: '/teachManage/experimentTask',
           query: {
             courseId: this.formItem.courseId,
           }

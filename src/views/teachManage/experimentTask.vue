@@ -1,23 +1,26 @@
 <template>
-  <div>
-    <div class="user-manage" style="justify-content: flex-end" v-if="loginInfo.level === 1">
-      <Router-link to="./addTask">
+  <div class="box">
+    <div class="search-title">
+      <div>
+        <div>
+          <p>课程名称：</p>
+          <Select v-model="formItem.courseId" style="width:170px;margin-top: 8px">
+            <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
+        <div>
+          <p>实验教室：</p>
+          <Select v-model="formItem.romId" style="width:170px;margin-top: 8px">
+            <Option v-for="item in roList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
+      </div>
+      <Button type="primary" @click="searchExp" style="height: 33px;margin-top: 8px;">搜索</Button>
+    </div>
+    <div class="user-manage" v-if="level === 1">
+      <Router-link to="/addTask">
         <Button type="primary" style="height: 33px;margin-top: 10px;">添加实验任务</Button>
       </Router-link>
-    </div>
-    <div style="display:flex;margin-bottom: 8px;margin-top: 8px">
-      <div style="width: 40%">
-        课程名称：
-        <Select v-model="formItem.courseId" style="width:170px" @on-change="choiceCource">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-      </div>
-      <div>
-        实验教室：
-        <Select v-model="formItem.romId" style="width:170px">
-          <Option v-for="item in roList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-      </div>
     </div>
     <Table border ref="selection" :columns="columns4" :data="taskList"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
@@ -30,7 +33,8 @@
   export default {
     data() {
       return {
-        loginInfo: '',               //用户登录信息
+        loginInfo: [],               //用户登录信息
+        level: null,
         pageNo: 1, pageNo1: 1, pageNo2: 1, total: 0, current: 1,
         taskList: [],       //课程列表
         courceList: [],
@@ -65,7 +69,7 @@
                   on: {
                     click: () => {
                       this.$router.push({
-                        path: './taskInfo',
+                        path: '/taskInfo',
                         query: {
                           expTeskId: params.row.id
                         }
@@ -99,9 +103,9 @@
                   },
                   on: {
                     click: () => {
-                      if(this.$store.state.loginInfo.level === 3) {
+                      if(parseInt(this.Cookies.get('access')) === 3) {
                         this.$router.push({
-                          path: './addReport',
+                          path: '/addReport',
                           query: {
                             taskId: params.row.id,
                             courseId: params.row.courseId,
@@ -134,12 +138,12 @@
                   },
                   style: {
                     marginRight: '5px',
-                    display: this.$store.state.loginInfo.level === 1? 'block': 'none',
+                    display: parseInt(this.Cookies.get('access')) === 1? 'block': 'none',
                   },
                   on: {
                     click: () => {
                       this.$router.push({
-                        path: './editTask',
+                        path: '/editTask',
                         query: {
                           expTeskId: params.row.id
                         }
@@ -154,7 +158,7 @@
                   },
                   style: {
                     marginRight: '5px',
-                    display: this.$store.state.loginInfo.level === 3? 'block': 'none',
+                    display: parseInt(this.Cookies.get('access')) === 3? 'block': 'none',
                   },
                   on: {
                     click: () => {
@@ -176,9 +180,10 @@
 
     created() {
       // 老师进入要先选择实验课程名称，学生进入可查看所在课程的所有实验任务
-      this.loginInfo = this.$store.state.loginInfo;
+      this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+      this.level = parseInt(this.Cookies.get('access'));
       this.formItem.courseId = this.$route.query.courseId;
-      if((this.formItem.courseId === undefined || this.formItem.courseId === null)&& this.loginInfo.level === 1)  {
+      if((this.formItem.courseId === undefined || this.formItem.courseId === null)&& this.level === 1)  {
         this.$Message.warning('请先选择课程名称');
       } else {
         this.getTaskList();
@@ -193,9 +198,8 @@
         this.getTaskList();
       },
 
-      //选择课程，显示对应已有的实验任务
-      choiceCource(){
-        this.getTaskList();
+      searchExp() {
+          this.getTaskList();
       },
 
       //获取课程列表
@@ -203,11 +207,11 @@
         let that = this;
         let url = that.BaseConfig + '/selectCourseAll';
         let params;
-        if(that.loginInfo.level === 1) {
+        if(this.level === 1) {
           params = {
             pageNo: that.pageNo1,
             pageSize: 10,
-            teacherUserId: that.$store.state.loginInfo.userId,
+            teacherUserId: that.loginInfo.userId,
           }
         } else {
           params = {
@@ -280,7 +284,7 @@
         let that = this;
         let url = that.BaseConfig + '/selectExpTeskAll';
         let params;
-        if(that.loginInfo.level === 1 || (this.formItem.courseId !== undefined && this.formItem.courseId !== null)) {
+        if(that.level === 1 || (this.formItem.courseId !== undefined && this.formItem.courseId !== null)) {
           params = {
             courseId: that.formItem.courseId,
             pageNo: that.pageNo,

@@ -1,11 +1,16 @@
 <template>
-  <div>
+  <div class="box">
     <Form :model="formItem" :label-width="80">
       <FormItem label="实验题目：">
         <Input v-model="formItem.title" readonly></Input>
       </FormItem>
       <FormItem label="实验内容：">
-        <div v-html="formItem.content" style="border: 1px solid #ccc;"></div>
+        <quill-editor
+                v-model="formItem.content"
+                ref="myQuillEditor"
+                :options="editorOption"
+        >
+        </quill-editor>
       </FormItem>
       <FormItem label="课程名称：">
         <Input v-model="formItem.courseName" style="width: 187px" readonly></Input>
@@ -30,11 +35,16 @@
 </template>
 
 <script>
+    import { quillEditor } from 'vue-quill-editor';
   export default {
+      components: {
+          quillEditor,
+      },
     data() {
       return {
+        editorOption:{},
         expReportId: null,
-        level: this.$store.state.loginInfo.level,
+        level: this.Cookies.get('access'),
         formItem: {
           teskId: null,
           courseId: null,
@@ -77,7 +87,7 @@
       //返回上一级
       goBack() {
         this.$router.push({
-          path: './experimentReport',
+          path: '/teachManage/experimentReport',
           query: {
             courseId: this.formItem.courseId,
           }
@@ -88,9 +98,9 @@
   }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   /deep/ .ql-toolbar.ql-snow + .ql-container.ql-snow {
-    height: 480px;
+    height: 200px;
     overflow-y: scroll;
   }
   .ivu-btn {

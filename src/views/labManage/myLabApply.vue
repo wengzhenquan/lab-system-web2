@@ -1,12 +1,21 @@
 <template>
     <div class="box">
         <div class="search-title">
-            <!--<div>-->
-                <!--<div><p>账户：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="userName"/></div>-->
-                <!--<div><p>用户名称：</p><Input style="width: 140px;margin-top: 8px" v-model="name"/></div>-->
-                <!--<div><p>身份：</p><Input style="width: 140px;margin-top: 8px" v-model="identityName"/></div>-->
-            <!--</div>-->
-            <!--<Button type="primary" @click="searchUser">查询</Button>-->
+            <div>
+                <div>
+                    <p>申请教室：</p>
+                    <Select v-model="romId" style="width:170px;margin-top: 8px">
+                        <Option v-for="item in select1Lab" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+                </div>
+                <div>
+                    <p>申请状态：</p>
+                    <Select v-model="state" style="width:170px;margin-top: 8px">
+                        <Option v-for="item in stateSelct" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+                </div>
+            </div>
+            <Button type="primary" @click="searchUser">查询</Button>
         </div>
         <div class="user-manage">
             <Button type="primary" @click="goAddApply">提交申请</Button>
@@ -52,6 +61,32 @@
                 applyList: [],
                 userId: JSON.parse(localStorage.getItem('loginInfo')).userId,
                 modal1: false,
+                romId: 0,
+                select1Lab: [
+                    {
+                        value: 0,
+                        label:'全部'
+                    }
+                ],
+                state: -1,
+                stateSelct: [
+                    {
+                        value: -1,
+                        label:'全部'
+                    },
+                    {
+                        value: 0,
+                        label:'申请中'
+                    },
+                    {
+                        value: 1,
+                        label:'已审批'
+                    },
+                    {
+                        value: 2,
+                        label:'未通过审批'
+                    },
+                ],
                 romsLog: {
                     userId: JSON.parse(localStorage.getItem('loginInfo')).userId,
                     romId: null,
@@ -82,17 +117,12 @@
                         align: 'center'
                     },
                     {
-                        title: '申请状态',   // 0 - 审核中，1-已审批， 2-已处理
+                        title: '申请状态',   // 0 - 审核中，1-已审批， 2-未通过审批
                         key: 'state',
                         align: 'center',
                         render: (h,params) => {
-                            return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '已处理'))
+                            return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '未通过审批'))
                         }
-                    },
-                    {
-                        title: '分配教室',
-                        key: 'romName',
-                        align: 'center'
                     },
                     {
                         title: '处理人',
@@ -145,9 +175,14 @@
             getApplyList() {
                 let that = this;
                 let url = that.BaseConfig + '/selectRomLogAll';
+                let romId;
+                that.romId === 0? romId = '': romId = that.romId;
+                let state;
+                that.state === -1 ? state = '' : state = that.state;
                 let params ={
+                    romId: romId,
                     userId: that.userId,
-                    // state: 0,
+                    state: state,
                     pageNo: that.pageNo,
                     pageSize: 10,
                 }
@@ -195,6 +230,10 @@
                                     value: item.id,
                                     label: item.romName,
                                 })
+                                that.select1Lab.push({
+                                    value: item.id,
+                                    label: item.romName,
+                                })
                             })
                         } else {
                             that.$Message.error(data.retMsg);
@@ -217,7 +256,7 @@
             },
             ok() {
                 let that = this;
-                let url = that.BaseConfig + '/selectRomLogAll';
+                let url = that.BaseConfig + '/insertRomLog';
                 that.romsLog.startTime = new Date(that.romsLog.startTime).getTime();
                 that.romsLog.endTime = new Date(that.romsLog.endTime).getTime();
                 that.romsLog.creatTime = new Date().getTime();

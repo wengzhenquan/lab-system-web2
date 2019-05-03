@@ -1,13 +1,22 @@
 <template>
-  <div>
-    <div style="margin-bottom: 10px;display: flex;justify-content: space-between">
+  <div class="box">
+    <div class="search-title">
       <div>
-        课程名称：
-        <Select v-model="courseId" style="width:170px" :clearable="true" @on-change="getStudentList">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
+        <div>
+          <p>课程名称：</p>
+          <Select v-model="courseId" style="width:170px;margin-top: 8px">
+            <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
+        <!--<div>-->
+          <!--<p>学生姓名：</p>-->
+          <!--<Input v-model="name" style="width: 150px;margin-top: 8px"/>-->
+        <!--</div>-->
       </div>
-      <Button type="primary" style="height: 30px;margin-left: 10px" @click="addStu">添加学生</Button>
+      <Button type="primary" @click="searchStudent"  style="height: 33px;margin-top: 8px;">搜索</Button>
+    </div>
+    <div style="margin: 10px 0;display: flex">
+      <Button type="primary" style="height: 30px;" @click="addStu">添加学生</Button>
     </div>
     <Table border ref="selection" :columns="columns4" :data="studentList"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
@@ -60,6 +69,7 @@
         courList: [],      //此教师开设的课程列表
         courseId: null,
         level: null,
+        loginInfo: [],
         isAdd:false,     //添加学生进课程modal框
         userName: '',    //输入添加学生的学号
         userInfo: '',    //搜索是否有此学生信息
@@ -106,7 +116,8 @@
     },
 
     created() {
-      this.level = this.$store.state.loginInfo.level;
+      this.level = parseInt(this.Cookies.get('access'));
+      this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
       this.courseId = this.$route.query.courseId;
       if(this.courseId === undefined || this.courseId === null) {
         this.$Message.warning('请先选择课程')
@@ -130,6 +141,11 @@
         } else {
           this.isAdd = true;
         }
+      },
+
+      searchStudent() {
+          this.pageNo = 1;
+          this.getStudentList();
       },
 
       //获取某课程的学生列表
@@ -163,7 +179,7 @@
         let params = {
           pageNo: that.pageNo1,
           pageSize: 10,
-          teacherUserId: that.$store.state.loginInfo.userId,
+          teacherUserId: that.loginInfo.userId,
         };
         let data = null;
         that
@@ -227,7 +243,7 @@
         let url = that.BaseConfig + '/insertStudentToCourse';
         let params = {
           studentId: studentId,
-          teacherId: that.$store.state.loginInfo.userId,
+          teacherId: that.loginInfo.userId,
           courseId: that.courseId,
         };
         let data = null;

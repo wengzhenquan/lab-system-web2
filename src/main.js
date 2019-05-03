@@ -17,6 +17,12 @@ import { Store } from 'vuex';
 import 'promise-polyfill';
 import VueAMap from 'vue-amap';
 import './styles/icon/iconfont.css';
+import VueQuillEditor from 'vue-quill-editor';
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+require('vue-quill-editor');
 Vue.use(iView);
 
 Vue.use(VueAMap);
@@ -38,6 +44,7 @@ Vue.prototype.Cookies = Cookies;
 Vue.prototype.BaseConfig = config.serviceurl;
 Vue.prototype.formatDate = formatDate;
 Vue.prototype.timestamp = timestamp;
+Vue.use(VueQuillEditor);
 
 new Vue({
     el: '#app',

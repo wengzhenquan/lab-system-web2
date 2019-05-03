@@ -1,10 +1,10 @@
 <template>
-    <div>
+    <div style="background-color: #fff;border-radius: 5px;padding: 12px">
       <!--添加实验任务-->
       <!--老师才可添加实验任务、且课程必须是此老师所开设的课程-->
       <Form :model="formItem" :label-width="80">
         <FormItem label="实验题目：">
-          <Input v-model="formItem.title"></Input>
+          <Input v-model="formItem.title" style="width: 300px"></Input>
         </FormItem>
         <FormItem label="实验内容：">
           <quill-editor
@@ -62,6 +62,7 @@
       },
         data() {
             return {
+              loginInfo: [],
               editorOption:{},
               pageNo: 1, pageNo1:1,
               upUrl: this.BaseConfig + '/fileUpload',     // 上传文件传入地址
@@ -82,6 +83,7 @@
         },
 
       created() {
+        this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
         this.getCourceList();
       },
 
@@ -98,7 +100,7 @@
             let params = {
               pageNo: that.pageNo1,
               pageSize: 10,
-              teacherUserId: that.$store.state.loginInfo.userId,
+              teacherUserId: that.loginInfo.userId,
             };
             let data = null;
             that
@@ -146,7 +148,7 @@
                   if(res.data.retCode === 0) {
                     that.$Message.success('添加实验任务成功');
                     that.$router.push({
-                      path: './experimentTask',
+                      path: '/teachManage/experimentTask',
                       query: {
                         courseId: that.formItem.courseId,
                       }
@@ -162,7 +164,7 @@
           //取消添加任务
           ok() {
             this.$router.push({
-              path: './experimentTask',
+              name: 'experimentTask',
             })
           },
         },

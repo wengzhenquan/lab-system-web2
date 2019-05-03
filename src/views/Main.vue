@@ -21,10 +21,11 @@
         <div class="main-header-con" :style="{paddingLeft: shrink?'0':'200px'}">
             <div class="main-header">
                 <div class="icon-header" @click="toggleClick"><i class="iconfont">&#xe627;</i></div>
-                <div>
+                <div style="width: 96%">
                     <p style="font-size: 14px;line-height: 64px">
                         <span style="padding-right: 10px">{{nowTime}}</span>
-                        欢迎登陆 | {{loginInfo.name}}
+                        欢迎"{{loginInfo.name}}"登录 &nbsp;
+                        您的身份是:{{loginInfo.identityName}}
                     </p>
                     <div class="header-avator-con">
                         <Button @click="backLogin">

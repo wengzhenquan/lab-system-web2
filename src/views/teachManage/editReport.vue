@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="box">
       <quill-editor
         v-model="formItem.content"
         ref="myQuillEditor"
@@ -64,7 +64,7 @@
     },
 
     created() {
-      this.level = this.$store.state.loginInfo.level;
+      this.level = parseInt(this.Cookies.get('access'));
       this.expReportId = this.$route.query.expReportId;
       this.getReportInfo();
     },
@@ -111,7 +111,7 @@
             if(res.data.retCode === 0) {
               that.$Message.success('修改成功');
               that.$router.push({
-                path: './experimentReport',
+                path: '/teachManage/experimentReport',
               })
             } else {
               that.$Message.error(res.data.retMsg);
@@ -134,7 +134,7 @@
             if(res.data.retCode === 0) {
               that.$Message.success('评分完成');
               that.$router.push({
-                path: './experimentReport',
+                path: '/teachManage/experimentReport',
                 query: {
                   courseId: that.formItem.courseId,
                 }
@@ -151,7 +151,7 @@
       ok() {
         if(this.level === 1) {
           this.$router.push({
-            path: './experimentReport',
+            path: '/teachManage/experimentReport',
             query: {
               courseId: this.formItem.courseId,
             }

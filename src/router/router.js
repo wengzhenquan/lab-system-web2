@@ -57,12 +57,42 @@ export const otherRouter = {
             name: "home_index",
             component: () => import("@/views/home/home.vue")
         },
-        // {
-        //     path: "addStore",
-        //     title: "新增店铺",
-        //     name: "addStore",
-        //     component: () => import("@/views/storeManagement/storeInfo.vue")
-        // },
+        {
+            path: "addTask",
+            title: "添加任务",
+            name: "addTask",
+            component: () => import("@/views/teachManage/addTask.vue")
+        },
+        {
+            path: "taskInfo",
+            title: "查看任务",
+            name: "addTask",
+            component: () => import("@/views/teachManage/taskInfo.vue")
+        },
+        {
+            path: "editTask",
+            title: "编辑任务",
+            name: "editTask",
+            component: () => import("@/views/teachManage/editTask.vue")
+        },
+        {
+            path: "addReport",
+            title: "提交实验报告",
+            name: "addReport",
+            component: () => import("@/views/teachManage/addReport.vue")
+        },
+        {
+            path: "reportInfo",
+            title: "查看实验报告",
+            name: "reportInfo",
+            component: () => import("@/views/teachManage/reportInfo.vue")
+        },
+        {
+            path: "editReport",
+            title: "报告评分",
+            name: "editReport",
+            component: () => import("@/views/teachManage/editReport.vue")
+        },
     ]
 };
 

@@ -7,19 +7,19 @@
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
                 </div>
             </TabPane>
-            <TabPane label="待审核">
+            <TabPane label="申请中">
                 <Table border ref="selection" :columns="columns" :data="applyList"></Table>
                 <div style="margin-top: 20px; display: flex;justify-content: flex-end">
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
                 </div>
             </TabPane>
-            <TabPane label="通过审批">
+            <TabPane label="已审批">
                 <Table border ref="selection" :columns="columns" :data="applyList"></Table>
                 <div style="margin-top: 20px; display: flex;justify-content: flex-end">
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
                 </div>
             </TabPane>
-            <TabPane label="未通过">
+            <TabPane label="未通过审批">
                 <Table border ref="selection" :columns="columns" :data="applyList"></Table>
                 <div style="margin-top: 20px; display: flex;justify-content: flex-end">
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
@@ -94,7 +94,6 @@
                                     props: {
                                         type: 'primary',
                                         size: 'small',
-                                        disabled: params.row.state === 0? 'true' : 'false'
                                     },
                                     style: {
                                         marginRight: '5px'
@@ -183,7 +182,7 @@
                     })
             },
 
-            //修改设备申请状态
+            //修改申请状态
             editApplyStatus(num) {
                 let that = this;
                 let url = that.BaseConfig + '/updateRomLogState';
@@ -202,6 +201,7 @@
                             that.$Message.success('处理成功！');
                             this.modal = false;
                             that.getApplyList();
+                            // that.changeLab();  //修改实验室状态
                         } else {
                             that.$Message.error(data.retMsg);
                         }

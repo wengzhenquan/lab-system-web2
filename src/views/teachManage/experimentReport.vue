@@ -1,19 +1,25 @@
 <template>
-  <div>
-    <div style="display:flex;margin-bottom: 8px;margin-top: 8px">
-      <div style="width: 40%">
-        课程名称：
-        <Select v-model="formItem.courseId" style="width:170px" @on-change="choiceCource">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-      </div>
+  <div class="box">
+    <div class="search-title" style="margin-bottom: 12px">
       <div>
-        实验课题：
-        <Select v-model="formItem.courseId" style="width:170px">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
+        <div>
+          <p>课程名称：</p>
+          <Select v-model="formItem.courseId" style="width:170px;margin-top: 8px">
+            <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
+        <div>
+          <p>任务标题：</p>
+          <Input v-model="taskTitle" style="width: 150px;margin-top: 8px"/>
+        </div>
+        <div>
+          <p>学生姓名：</p>
+          <Input v-model="name" style="width: 150px;margin-top: 8px"/>
+        </div>
       </div>
+      <Button type="primary" @click="searchReport"  style="height: 33px;margin-top: 8px;">搜索</Button>
     </div>
+
     <Table border ref="selection" :columns="columns4" :data="reportList"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
       <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
@@ -30,6 +36,9 @@
         courList: [],    //课程列表
         reportList: [],  //实验报告列表
         level: null,
+        loginInfo: [],
+        taskTitle: '',
+        name: '',
         formItem: {
           courseId: null,
           score: null,
@@ -39,7 +48,7 @@
         },
         columns4: [
           {
-            title: '实验标题',
+            title: '任务标题',
             key: 'title'
           },
           {
@@ -54,7 +63,7 @@
                   on: {
                     click: () => {
                       this.$router.push({
-                        path: './reportInfo',
+                        path: '/reportInfo',
                         query: {
                           expReportId: params.row.id
                         }
@@ -98,7 +107,7 @@
                   on: {
                     click: () => {
                       this.$router.push({
-                        path: './editReport',
+                        path: '/editReport',
                         query: {
                           expReportId: params.row.id,
                         }
@@ -134,11 +143,11 @@
     },
 
     created() {
-      this.getCourceList();
       //如果学生，直接显示学生所提交的实验报告
-      this.formItem.studentUserId = this.$store.state.loginInfo.userId;
+      this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
+      this.formItem.studentUserId = this.loginInfo.userId;
       this.formItem.courseId = this.$route.query.courseId;
-      this.level = this.$store.state.loginInfo.level;
+      this.level = parseInt(this.Cookies.get('access'));
       if(this.level === 3) {
         this.getReportList();
       } else if(this.formItem.courseId !== undefined && this.formItem.courseId !== null) {
@@ -146,6 +155,7 @@
       } else {
         this.$Message.warning('请选择课程名称');
       }
+      this.getCourceList();
     },
 
     methods: {
@@ -162,7 +172,7 @@
         let params = {
           pageNo: that.pageNo1,
           pageSize: 10,
-          teacherUserId: that.$store.state.loginInfo.userId,
+          teacherUserId: that.loginInfo.userId,
         };
         let data = null;
         that
@@ -191,8 +201,8 @@
           })
       },
 
-      //选择课程，显示对应已有的实验任务
-      choiceCource(){
+      searchReport(){
+        this.pageNo = 1;
         this.getReportList();
       },
 
@@ -200,20 +210,23 @@
       getReportList() {
         let that = this;
         let url = that.BaseConfig + '/selectExpReportAll';
-        let params;
+        let studentUserId;
+        let courseId;
         if(this.level === 3) {
-          params = {
-            pageNo: that.pageNo,
-            pageSize: 10,
-            studentUserId: that.formItem.studentUserId,
-          };
+            studentUserId = that.formItem.studentUserId;
+            courseId = '';
         } else {
-          params = {
+            courseId = that.formItem.courseId;
+            studentUserId = '';
+        }
+        let params = {
+            title: that.taskTitle,
+            name: that.name,
+            studentUserId: studentUserId,
+            courseId: courseId,
             pageNo: that.pageNo,
             pageSize: 10,
-            courseId: that.formItem.courseId,
-          };
-        }
+        };
         let data = null;
         that
           .$http(url, params, data, 'get')

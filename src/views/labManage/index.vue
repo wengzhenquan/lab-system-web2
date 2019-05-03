@@ -175,7 +175,9 @@
                                     },
                                     on: {
                                         click: () => {
-                                            // 申请实验室
+                                            this.$router.push({
+                                                name: 'labApprovalManage1'
+                                            })
                                         }
                                     }
                                 }, '去申请'),

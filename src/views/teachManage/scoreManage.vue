@@ -1,18 +1,19 @@
 <template>
-  <div>
-    <div class="user-manage">
-      <div style="width: 40%;margin-bottom: 10px" v-if="level === 1">
-        课程名称：
-        <Select v-model="courseId" style="width:170px" @on-change="getList">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
+  <div class="box">
+    <div class="search-title">
+      <div>
+        <div>
+          <p>课程名称：</p>
+          <Select v-model="courseId" style="width:170px;margin-top: 8px">
+            <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
+        </div>
+        <!--<div>-->
+        <!--<p>学生姓名：</p>-->
+        <!--<Input v-model="name" style="width: 150px;margin-top: 8px"/>-->
+        <!--</div>-->
       </div>
-      <div style="width: 40%;margin-bottom: 10px" v-if="level === 3">
-        课程名称：
-        <Select v-model="courseId" style="width:170px" @on-change="getAchieveList">
-          <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-        </Select>
-      </div>
+      <Button type="primary" @click="searchScore"  style="height: 33px;margin-top: 8px;">搜索</Button>
     </div>
     <Table border :columns="columns" :data="achieveList" v-if="level === 1"></Table>
     <Table border :columns="columnsS" :data="achieveList" v-if="level === 3"></Table>
@@ -49,6 +50,7 @@
         pageNo: 1,pageNo1: 1,
         total: 0,
         level: null,
+        loginInfo: [],
         achieveList: [],   //学生成绩列表
         courceList: [],
         courList:[],        //此用户（教师）开设的课程列表
@@ -142,7 +144,8 @@
     },
 
     created() {
-      this.level = this.$store.state.loginInfo.level;
+      this.level = parseInt(this.Cookies.get('access'));
+      this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
       this.getCourceList();
     },
 
@@ -157,12 +160,13 @@
         }
       },
 
-      getList() {
-        if(this.level === 1) {
-          this.choiceAchieveList();
-        } else {
-          this.getAchieveList();
-        }
+      searchScore() {
+          this.pageNo =1;
+          if(this.level === 1) {
+              this.choiceAchieveList();
+          } else {
+              this.getAchieveList();
+          }
       },
 
       //学生查看成绩
@@ -172,7 +176,7 @@
         let params = {
           pageNo: that.pageNo,
           pageSize: 10,
-          studentId: that.$store.state.loginInfo.userId,
+          studentId: that.loginInfo.userId,
         };
         let data = null;
         that
@@ -199,7 +203,7 @@
           pageNo: that.pageNo,
           pageSize: 10,
           courseId: that.courseId,
-          teacherUserId: that.$store.state.loginInfo.userId,
+          teacherUserId: that.loginInfo.userId,
         };
         console.log(params)
         let data = null;
@@ -209,7 +213,6 @@
             data = res.data;
             if(data.retCode === 0) {
               that.achieveList = data.data.data;
-              console.log(that.achieveList)
               that.total = data.data.total;
             } else {
               that.$Message.error(data.retMsg);
@@ -224,19 +227,13 @@
       getCourceList() {
         let that = this;
         let url = that.BaseConfig + '/selectCourseAll';
-        let params;
-        if(that.level === 1) {
-          params = {
+        let teacherUserId;
+        that.level === 1 ? teacherUserId = that.loginInfo.userId : teacherUserId = '';
+        let params = {
             pageNo: that.pageNo1,
             pageSize: 10,
-            teacherUserId: that.$store.state.loginInfo.userId,
-          }
-        } else {
-          params = {
-            pageNo: that.pageNo1,
-            pageSize: 10,
-          }
-        }
+            teacherUserId: teacherUserId,
+        };
         let data = null;
         that
           .$http(url, params, data, 'get')
@@ -271,7 +268,7 @@
         let params = {
           courseId: that.courseId,
           studentId: that.studentId,
-          teacherId: that.$store.state.loginInfo.userId,
+          teacherId: that.loginInfo.userId,
         };
         console.log(params)
         let data = null;
@@ -300,7 +297,7 @@
           achieve: that.achieve,
           courseId: that.courseId,
           studentId: that.studentId,
-          teacherId: that.$store.state.loginInfo.userId,
+          teacherId: that.loginInfo.userId,
         };
         let data = null;
         that
@@ -330,7 +327,7 @@
         let url = that.BaseConfig + '/autoAchieveOnCourse';
         let params = {
           courseId: that.courseId,
-          teacherId: that.$store.state.loginInfo.userId,
+          teacherId: that.loginInfo.userId,
         };
         let data = null;
         that

@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div class="box">
       <Form :model="formItem" :label-width="80">
         <FormItem label="实验题目：">
-          <Input v-model="formItem.title"></Input>
+          <Input v-model="formItem.title" style="width: 300px"></Input>
         </FormItem>
         <FormItem label="实验内容：">
           <quill-editor
@@ -164,7 +164,7 @@
             if(res.data.retCode === 0) {
               that.$Message.success('修改成功');
               that.$router.push({
-                path: './experimentTask',
+                path: '/teachManage/experimentTask',
                 query: {
                   courseId: that.formItem.courseId,
                 }
@@ -181,7 +181,7 @@
       //取消修改
       ok() {
         this.$router.push({
-          path: './experimentTask',
+          path: '/teachManage/experimentTask',
           query: {
             courseId: this.formItem.courseId,
           }
