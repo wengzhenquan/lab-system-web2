@@ -151,32 +151,6 @@ export const appRouter = [
         ]
     },
     {
-        path: "/labManage",
-        icon: "i iconfont icon-my_shezhi_ico",
-        name: "labManage",
-        access: 1,
-        title: "实验室管理",
-        component: Main,
-        children: [
-            {
-                path: "labIndex1",
-                icon: "i iconfont icon-guanli",
-                title: "实验室管理",
-                name: "labIndex1",
-                access: 1,
-                component: () => import("@/views/labManage/index")
-            },
-            {
-                path: "labApprovalManage1",
-                icon: "i iconfont icon-guanli",
-                title: "实验室申请",
-                name: "labApprovalManage1",
-                access: 1,
-                component: () => import("@/views/labManage/myLabApply")
-            },
-        ]
-    },
-    {
         path: "/deviceManage",
         icon: "i iconfont icon-my_shezhi_ico",
         name: "deviceManage",
@@ -257,32 +231,6 @@ export const appRouter = [
                 name: "deviceIndex",
                 access: 2,
                 component: () => import("@/views/deviceManage/deviceManage")
-            },
-        ]
-    },
-    {
-        path: "/repairApply",
-        icon: "i iconfont icon-my_shezhi_ico",
-        name: "deviceManage",
-        access: 1,
-        title: "设备管理",
-        component: Main,
-        children: [
-            {
-                path: "useManage1",
-                icon: "i iconfont icon-guanli",
-                title: "使用与分配",
-                name: "useManage1",
-                access: 1,
-                component: () => import("@/views/deviceManage/useManage1")
-            },
-            {
-                path: "repairApply",
-                icon: "i iconfont icon-guanli",
-                title: "设备报修申请",
-                name: "repairApply",
-                access: 1,
-                component: () => import("@/views/deviceManage/repairApply")
             },
         ]
     },
@@ -389,6 +337,50 @@ export const appRouter = [
         ]
     },
     {
+        path: "/labManage",
+        icon: "i iconfont icon-my_shezhi_ico",
+        name: "labManage",
+        access: 1,
+        title: "实验室管理",
+        component: Main,
+        children: [
+            {
+                path: "labIndex1",
+                icon: "i iconfont icon-guanli",
+                title: "实验室管理",
+                name: "labIndex1",
+                access: 1,
+                component: () => import("@/views/labManage/index")
+            },
+            {
+                path: "labApprovalManage1",
+                icon: "i iconfont icon-guanli",
+                title: "实验室申请",
+                name: "labApprovalManage1",
+                access: 1,
+                component: () => import("@/views/labManage/myLabApply")
+            },
+        ]
+    },
+    {
+        path: "/repairApply",
+        icon: "i iconfont icon-my_shezhi_ico",
+        name: "deviceManage",
+        access: 1,
+        title: "设备管理",
+        component: Main,
+        children: [
+            {
+                path: "repairApply",
+                icon: "i iconfont icon-guanli",
+                title: "设备报修申请",
+                name: "repairApply",
+                access: 1,
+                component: () => import("@/views/deviceManage/repairApply")
+            },
+        ]
+    },
+    {
         path: "/teachManage",
         icon: "i iconfont icon-my_shezhi_ico",
         name: "teachManage",
@@ -427,6 +419,21 @@ export const appRouter = [
                 name: "scoreManage",
                 access: 3,
                 component: () => import("@/views/teachManage/scoreManage")
+            },
+        ]
+    },
+    {
+        path: "/user",
+        name: "user",
+        title: "个人信息",
+        component: Main,
+        children: [
+            {
+                path: "userInfo",
+                icon: "i iconfont icon-guanli",
+                title: "个人信息",
+                name: "userInfo",
+                component: () => import("@/views/user/userInfo")
             },
         ]
     },

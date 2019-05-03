@@ -1,12 +1,16 @@
 <template>
     <div class="box">
         <div class="search-title">
-            <!--<div>-->
-            <!--<div><p>账户：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="userName"/></div>-->
-            <!--<div><p>用户名称：</p><Input style="width: 140px;margin-top: 8px" v-model="name"/></div>-->
-            <!--<div><p>身份：</p><Input style="width: 140px;margin-top: 8px" v-model="identityName"/></div>-->
-            <!--</div>-->
-            <!--<Button type="primary" @click="searchUser">查询</Button>-->
+            <div>
+                <div><p>申请人：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="applyName"/></div>
+                <div><p>处理人：</p><Input style="width: 140px;margin-top: 8px" v-model="handleUserName"/></div>
+                <div><p>设备类型：</p>
+                    <Select v-model="eqClassId" style="width: 140px;margin-top: 8px">
+                        <Option v-for="item in selectEq1" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    </Select>
+                </div>
+            </div>
+            <Button type="primary" @click="searchUser">查询</Button>
         </div>
         <div class="user-manage">
             <Button type="primary" @click="goAddApply">提交申请</Button>
@@ -18,23 +22,47 @@
 
         <Modal
                 v-model="modal1"
-                title="实验室申请"
+                title="添加报修申请"
                 @on-ok="ok">
             <div>
-                <Form :model="romsLog" :label-width="90">
+                <Form :model="equipmentLog" :label-width="90">
                     <FormItem label="申请人：">
-                        <Input v-model="romsLog.userId" disabled style="width: 90%"></Input>
+                        <Input v-model="equipmentLog.applyName" disabled style="width: 90%"></Input>
                     </FormItem>
-                    <FormItem label="申请教室：">
-                        <Select v-model="romsLog.romId" style="width: 140px;margin-top: 8px">
-                            <Option v-for="item in selectLab" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                    <FormItem label="标题：">
+                        <Input v-model="equipmentLog.title" style="width: 90%"></Input>
+                    </FormItem>
+                    <FormItem label="设备类别：">
+                        <Select v-model="equipmentLog.eqClassId" style="width: 140px;margin-top: 8px">
+                            <Option v-for="item in selectEq" :value="item.value" :key="item.value">{{ item.label }}</Option>
                         </Select>
                     </FormItem>
-                    <FormItem label="使用时间：">
-                        <DatePicker type="datetime" v-model="romsLog.startTime" format="yyyy-MM-dd HH:mm" placeholder="开始使用时间" style="width: 200px"></DatePicker>
+                    <FormItem label="报修需求：">
+                        <Input v-model="equipmentLog.need" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="输入文字描述"></Input>
                     </FormItem>
-                    <FormItem label="结束时间：">
-                        <DatePicker type="datetime" v-model="romsLog.endTime" format="yyyy-MM-dd HH:mm" placeholder="结束使用时间" style="width: 200px"></DatePicker>
+                </Form>
+            </div>
+        </Modal>
+
+        <Modal
+                v-model="modal2"
+                title="修改报修申请"
+                @on-ok="editApply">
+            <div>
+                <Form :model="equipmentLog" :label-width="90">
+                    <FormItem label="申请人：">
+                        <Input v-model="equipmentLog.applyName" disabled style="width: 90%"></Input>
+                    </FormItem>
+                    <FormItem label="标题：">
+                        <Input v-model="equipmentLog.title" style="width: 90%"></Input>
+                    </FormItem>
+                    <FormItem label="设备类别：">
+                        <Select v-model="equipmentLog.eqClassId" style="width: 140px;margin-top: 8px">
+                            <Option v-for="item in selectEq" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                        </Select>
+                    </FormItem>
+                    <FormItem label="报修需求：">
+                        <Input v-model="equipmentLog.need" type="textarea" :autosize="{minRows: 4,maxRows: 5}" placeholder="输入文字描述"></Input>
                     </FormItem>
                 </Form>
             </div>
@@ -46,39 +74,54 @@
     export default {
         data() {
             return {
-                pageNo: 1,pageNo2:1,
+                pageNo: 1,pageNo2:1,pageNo1:1,
                 total:0,
                 current: 1,
                 applyList: [],
                 userId: JSON.parse(localStorage.getItem('loginInfo')).userId,
                 modal1: false,
-                romsLog: {
+                modal2: false,
+                applyName: '',
+                handleUserName: '',
+                equipmentLog: {
+                    creatTime: '',
                     userId: JSON.parse(localStorage.getItem('loginInfo')).userId,
-                    romId: null,
-                    startTime: '',
-                    endTime: '',
+                    type: 0,
+                    title: '',
+                    eqClassId: '',
+                    state: 0,
+                    need: '',
+                    applyId: JSON.parse(localStorage.getItem('loginInfo')).userId,
+                    applyName: JSON.parse(localStorage.getItem('loginInfo')).name,
                 },
-                labList: [],
-                selectLab: [],
+                eqList: [],
+                selectEq: [],
+                eqClassId: -1,
+                selectEq1: [
+                    {
+                        value: -1,
+                        label: '全部'
+                    }
+                ],
                 columns: [
                     {
+                        title: '标题',
+                        key: 'title',
+                        align: 'center'
+                    },
+                    {
                         title: '申请人',
-                        key: 'name',
+                        key: 'applyName',
                         align: 'center'
                     },
                     {
-                        title: '申请教室',
-                        key: 'romName',
+                        title: '设备类别',
+                        key: 'typeName',
                         align: 'center'
                     },
                     {
-                        title: '使用时间',
-                        key: 'startTime',
-                        align: 'center'
-                    },
-                    {
-                        title: '结束使用',
-                        key: 'endTime',
+                        title: '申请需求',
+                        key: 'need',
                         align: 'center'
                     },
                     {
@@ -90,13 +133,18 @@
                         }
                     },
                     {
-                        title: '分配教室',
-                        key: 'romName',
+                        title: '申请结果',
+                        key: 'result',
                         align: 'center'
                     },
                     {
                         title: '处理人',
-                        key: 'handleUser',
+                        key: 'handleUserName',
+                        align: 'center'
+                    },
+                    {
+                        title: '处理时间',
+                        key: 'handleTime',
                         align: 'center'
                     },
                     {
@@ -105,6 +153,18 @@
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.equipmentLog = params.row;
+                                            this.modal2 = true;
+                                        }
+                                    }
+                                }, '修改'),
                                 h('Button', {
                                     props: {
                                         type: 'error',
@@ -125,7 +185,7 @@
 
         created() {
             this.getApplyList();
-            this.getLabList();
+            this.getEqList();
         },
 
         methods: {
@@ -141,13 +201,18 @@
                 this.getApplyList();
             },
 
-            //获取实验室申请列表
+            //获取申请列表
             getApplyList() {
                 let that = this;
-                let url = that.BaseConfig + '/selectRomLogAll';
+                let url = that.BaseConfig + '/selectEquipmentLogAll';
+                let eqClassId;
+                that.eqClassId === -1 ? eqClassId = '': eqClassId = that.eqClassId;
                 let params ={
+                    eqClassId: eqClassId,
+                    applyName: that.applyName,
+                    handleUserName: that.handleUserName,
                     userId: that.userId,
-                    // state: 0,
+                    type: 0,
                     pageNo: that.pageNo,
                     pageSize: 10,
                 }
@@ -168,13 +233,12 @@
                     })
             },
 
-            //获取实验室列表
-            getLabList() {
+            //获取设备类别列表
+            getEqList() {
                 let that = this;
-                let url = that.BaseConfig + '/selectRomsAll';
+                let url = that.BaseConfig + '/selectEquipmentClassAll';
                 let params = {
-                    state: 0,
-                    pageNo: that.pageNo2,
+                    pageNo: that.pageNo1,
                     pageSize: 10,
                 };
                 let data = null;
@@ -183,17 +247,20 @@
                     .then(res => {
                         data = res.data;
                         if(data.retCode === 0) {
-                            that.labList = that.labList.concat(data.data.data);
-                            let total = data.data.total;
-                            if (that.labList.length < total) {
-                                that.pageNo2++;
-                                that.getLabList();
+                            that.eqList = that.eqList.concat(data.data.data);
+                            console.log(res)
+                            if(that.eqList.length < data.data.total) {
+                                that.pageNo1++;
+                                that.getDevSortList();
                             }
-                            that.labList.map(item =>{
-                                console.log(item)
-                                that.selectLab.push({
+                            that.eqList.map(item => {
+                                that.selectEq.push({
                                     value: item.id,
-                                    label: item.romName,
+                                    label: item.typeName
+                                })
+                                that.selectEq1.push({
+                                    value: item.id,
+                                    label: item.typeName
                                 })
                             })
                         } else {
@@ -207,21 +274,23 @@
 
             //提交申请
             goAddApply() {
-                this.romsLog={
+                this.equipmentLog = {
                     userId: JSON.parse(localStorage.getItem('loginInfo')).userId,
-                    romId: null,
-                    startTime: '',
-                    endTime: '',
+                        type: 0,
+                        title: '',
+                        eqClassId: '',
+                        state: 0,
+                        need: '',
+                        applyId: JSON.parse(localStorage.getItem('loginInfo')).userId,
+                        applyName: JSON.parse(localStorage.getItem('loginInfo')).name,
                 };
                 this.modal1 = true;
             },
             ok() {
                 let that = this;
-                let url = that.BaseConfig + '/selectRomLogAll';
-                that.romsLog.startTime = new Date(that.romsLog.startTime).getTime();
-                that.romsLog.endTime = new Date(that.romsLog.endTime).getTime();
-                that.romsLog.creatTime = new Date().getTime();
-                let data =that.romsLog;
+                let url = that.BaseConfig + '/insertEquipmentLog';
+                that.equipmentLog.creatTime = new Date().getTime();
+                let data =that.equipmentLog;
                 that
                     .$http(url, '', data, 'post')
                     .then(res => {
@@ -239,11 +308,34 @@
                     })
             },
 
+            //修改申请
+            editApply() {
+                let that = this;
+                let url = that.BaseConfig + '/updateEquipmentLog';
+                that.equipmentLog.creatTime = new Date().getTime();
+                let data =that.equipmentLog;
+                that
+                    .$http(url, '', data, 'post')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                            that.$Message.success('修改申请成功！');
+                            that.modal2 = false;
+                            that.getApplyList();
+                        } else {
+                            that.$Message.error(data.retMsg);
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
             del(id) {
                 let that = this;
-                let url = that.BaseConfig + '/deleteRomLog';
+                let url = that.BaseConfig + '/deleteEquipmentLog';
                 let params ={
-                    romLogId: id,
+                    equipmentLogId : id,
                 }
                 let data = null;
                 that
@@ -267,5 +359,4 @@
 </script>
 
 <style lang="less" scoped>
-
 </style>

@@ -152,6 +152,11 @@
                 equipmentId: null,
                 columns4: [
                     {
+                        title: '设备名称',
+                        key: 'eqName',
+                        align: 'center'
+                    },
+                    {
                         title: '编号',
                         key: 'serNumb',
                         align: 'center',
@@ -165,6 +170,7 @@
                         title: '状态',
                         key: 'state',
                         align: 'center',
+                        width: 80,
                         render: (h,params)=> {
                             return h('p',params.row.state === 0 ? '正常': (params.row.state === 1 ? '报修':'报废'))
                         }
@@ -173,6 +179,7 @@
                         title: '分配教室',
                         key: 'romNumb',
                         align: 'center',
+                        width:100,
                         render: (h,params)=> {
                             return h('p',params.row.romName === null ? '无': params.row.romName)
                         }
@@ -190,6 +197,7 @@
                     {
                         title: '操作',
                         key: 'action',
+                        width: 180,
                         align: 'center',
                         render: (h, params) => {
                             return h('div', [

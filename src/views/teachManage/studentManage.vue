@@ -4,7 +4,7 @@
       <div>
         <div>
           <p>课程名称：</p>
-          <Select v-model="courseId" style="width:170px;margin-top: 8px">
+          <Select v-model="courseId" style="width:170px;margin-top: 8px" >
             <Option v-for="item in courList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </div>
@@ -15,8 +15,9 @@
       </div>
       <Button type="primary" @click="searchStudent"  style="height: 33px;margin-top: 8px;">搜索</Button>
     </div>
-    <div style="margin: 10px 0;display: flex">
-      <Button type="primary" style="height: 30px;" @click="addStu">添加学生</Button>
+    <div class="user-manage">
+      <Button type="primary" style="height: 30px;" @click="addStu(2)">添加学生进课程</Button>
+      <Button type="success" style="height: 30px;" @click="getAllStudent">全部学生</Button>
     </div>
     <Table border ref="selection" :columns="columns4" :data="studentList"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
@@ -28,7 +29,7 @@
       <Modal
         v-model="isAdd"
         title="添加学生进课程"
-        @on-ok="addStudent"
+        :footer-hide="true"
         >
         <div style="padding: 12px">
           <div style="margin-bottom: 15px">
@@ -66,7 +67,10 @@
           },
         ],
         courceList: [],
-        courList: [],      //此教师开设的课程列表
+        courList: [{
+            value: -1,
+            label: '全部'
+        }],      //此教师开设的课程列表
         courseId: null,
         level: null,
         loginInfo: [],
@@ -74,6 +78,7 @@
         userName: '',    //输入添加学生的学号
         userInfo: '',    //搜索是否有此学生信息
         student: [],
+        addFlag: 1,   //1-添加学生 ，2-添加学生进课程
         columnsS: [
           {
             title: '学号',
@@ -119,11 +124,7 @@
       this.level = parseInt(this.Cookies.get('access'));
       this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
       this.courseId = this.$route.query.courseId;
-      if(this.courseId === undefined || this.courseId === null) {
-        this.$Message.warning('请先选择课程')
-      } else {
-        this.getStudentList();  //获取某课程的学生列表
-      }
+      this.getAllStud();
       this.getCourceList();    //获取此教师开设的课程列表
     },
 
@@ -134,13 +135,47 @@
         this.getStudentList();
       },
 
+      getAllStudent() {
+          this.pageNo = 1;
+          this.getAllStud();
+      },
+      getAllStud() {  //获取老师下所有学生列表
+          let that = this;
+          let url = that.BaseConfig + '/selectStudentByTeacherId';
+          let params = {
+              teacherUserId: that.loginInfo.userId,
+              pageNo: that.pageNo,
+              pageSize: 10,
+          };
+          let data = null;
+          that
+              .$http(url, params, data, 'get')
+              .then(res => {
+                  data = res.data;
+                  console.log(data)
+                  if(data.retCode === 0) {
+                      that.studentList = data.data.data;
+                      that.total = data.data.total;
+                  }
+              })
+              .catch(err => {
+                  that.$Message.error('请求错误');
+              })
+      },
+
       //添加学生模态框，先选择课程才能选择添加学生
-      addStu() {
-        if(this.courseId === undefined || this.courseId === null) {
-          this.$Message.warning('请先选择课程')
+      addStu(num) {
+        this.addFlag = num;
+        if(num === 2) {
+            if(this.courseId === undefined || this.courseId === null) {
+                this.$Message.warning('请先选择课程')
+            } else {
+                this.isAdd = true;
+            }
         } else {
-          this.isAdd = true;
+            this.isAdd = true;
         }
+
       },
 
       searchStudent() {
@@ -224,7 +259,6 @@
             data = res.data;
             if(data.retCode === 0) {
               that.userInfo = data.data.data;
-              console.log(that.userInfo)
               that.userInfo.map(item=> {
                 if(item.level === 3) {
                   that.student = that.student.concat(item);
@@ -237,39 +271,60 @@
           })
       },
 
-      //添加学生进课程
+      //添加学生
       addStudent(studentId) {
         let that = this;
-        let url = that.BaseConfig + '/insertStudentToCourse';
-        let params = {
-          studentId: studentId,
-          teacherId: that.loginInfo.userId,
-          courseId: that.courseId,
-        };
-        let data = null;
-        that
-          .$http(url, params, data, 'get')
-          .then(res => {
-            data = res.data;
-            if(data.retCode === 0) {
-              this.$Message.success('添加成功');
-              that.isAdd = false;
-              this.getStudentList();
-            } else {
-              that.$Message.error(data.retMsg);
-            }
-          })
-          .catch(err => {
-            that.$Message.error('请求错误');
-          })
+        if(that.addFlag === 1) {
+            let url = that.BaseConfig + '/insertStudentToTeacher';
+            let params = {
+                studentId: studentId,
+                teacherId: that.loginInfo.userId,
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    data = res.data;
+                    if(data.retCode === 0) {
+                        this.$Message.success('添加成功');
+                        that.isAdd = false;
+                        this.getAllStud();
+                    } else {
+                        that.$Message.error(data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        } else {
+            let url = that.BaseConfig + '/insertStudentToCourse';
+            let params = {
+                studentId: studentId,
+                teacherId: that.loginInfo.userId,
+                courseId: that.courseId,
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    data = res.data;
+                    if(data.retCode === 0) {
+                        this.$Message.success('添加成功');
+                        that.isAdd = false;
+                        this.getStudentList();
+                    } else {
+                        that.$Message.error(data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        }
       },
     }
   }
 </script>
 
 <style lang="less" scoped>
-  .user-manage {
-    display: flex;
-    justify-content: space-between;
-  }
+
 </style>

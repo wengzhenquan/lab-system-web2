@@ -35,8 +35,8 @@
                 <p>您正在处理该条设备申请，若通过申请，则点击蓝色按钮，不通过点击红色按钮！</p>
             </div>
             <div slot="footer" style="text-align: center">
-                <Button type="primary" @click="editApplyStatus(1)">通过审批</Button>
-                <Button type="error" @click="editApplyStatus(2)">未通过审批</Button>
+                <Button type="primary" @click="editStatus(1)">通过审批</Button>
+                <Button type="error" @click="editStatus(2)">未通过审批</Button>
             </div>
         </Modal>
     </div>
@@ -60,23 +60,29 @@
                 columns: [
                     {
                         title: '申请人',
-                        key: 'name'
+                        key: 'name',
+                        align: 'center',
+                        width: 100
                     },
                     {
                         title: '申请教室',
-                        key: 'romName'
+                        key: 'romName',
+                        align: 'center',
                     },
                     {
                         title: '使用时间',
-                        key: 'startTime'
+                        key: 'startTime',
+                        align: 'center',
                     },
                     {
                         title: '结束使用',
-                        key: 'endTime'
+                        key: 'endTime',
+                        align: 'center',
                     },
                     {
                         title: '申请状态',   // 0 - 审核中，1-已审批， 2-已处理
                         key: 'state',
+                        align: 'center',
                         render: (h,params) => {
                             return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '已处理'))
                         }
@@ -84,16 +90,19 @@
                     {
                         title: '处理人',
                         key: 'handleUser',
+                        align: 'center',
                     },
                     {
                         title: '操作',
                         key: 'action',
+                        align: 'center',
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {
                                     props: {
                                         type: 'primary',
                                         size: 'small',
+                                        disabled: params.row.state !== 0 ? 'true' : false
                                     },
                                     style: {
                                         marginRight: '5px'
@@ -106,15 +115,15 @@
                                             this.modal = true;
                                         }
                                     }
-                                }, '处理'),
+                                }, params.row.state !== 0 ? '已处理' : '待处理'),
                                 h('Button', {
                                     props: {
-                                        type: 'primary',
+                                        type: 'error',
                                         size: 'small'
                                     },
                                     on: {
                                         click: () => {
-                                            // 申请实验室
+                                            this.del(params.row.id)
                                         }
                                     }
                                 }, '删除'),
@@ -182,6 +191,13 @@
                     })
             },
 
+            editStatus(n) {
+                this.editApplyStatus(n);
+                if(n === 1) {
+                    this.changeLab(1);
+                }
+            },
+
             //修改申请状态
             editApplyStatus(num) {
                 let that = this;
@@ -192,6 +208,7 @@
                     state: num,
                     handleUserId: that.editState.handleUserId
                 };
+                console.log(params)
                 let data = null;
                 that
                     .$http(url, params, data, 'get')
@@ -201,7 +218,49 @@
                             that.$Message.success('处理成功！');
                             this.modal = false;
                             that.getApplyList();
-                            // that.changeLab();  //修改实验室状态
+                        } else {
+                            that.$Message.error(data.retMsg);
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
+            changeLab(num) {
+                let that = this;
+                let url = that.BaseConfig + '/updateRomState';
+                let params = {
+                    state: num,
+                    romId: that.editState.romId,
+                };
+                console.log(params)
+                that
+                    .$http(url,params, '', 'get')
+                    .then(res => {
+                        if(res.data.retCode === 0) {
+                        } else {
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
+            del(id) {
+                let that = this;
+                let url = that.BaseConfig + '/deleteRomLog';
+                let params ={
+                    romLogId: id,
+                }
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                            that.$Message.success('删除成功！');
+                            that.getApplyList(0);
                         } else {
                             that.$Message.error(data.retMsg);
                         }

@@ -24,6 +24,15 @@
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
       <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
     </div>
+
+    <!--评分模态框-->
+    <Modal
+            v-model="isComment"
+            title="报告评分"
+            @on-ok="submitScore"
+    >
+      <Input v-model="formItem.score" @on-change="numConfirm" placeholder="输入分数" style="width: 200px"></Input>
+    </Modal>
   </div>
 </template>
 
@@ -39,6 +48,7 @@
         loginInfo: [],
         taskTitle: '',
         name: '',
+        isComment: false,
         formItem: {
           courseId: null,
           score: null,
@@ -106,12 +116,8 @@
                   },
                   on: {
                     click: () => {
-                      this.$router.push({
-                        path: '/editReport',
-                        query: {
-                          expReportId: params.row.id,
-                        }
-                      })
+                      this.isComment = true;
+                      this.formItem = params.row
                     }
                   }
                 }, '评分'),
@@ -163,6 +169,25 @@
       pageChange(val) {
         this.pageNo = val;
         this.getReportList();
+      },
+
+        //数字正则
+      numConfirm() {
+          // let re=/^(?:[1-9]?\d|100)$/;
+          let re = /^([1-9]\d|\d)$/;
+          if(re.test(this.formItem.score)){
+          }else{
+              this.$Message.warning('请输入0~99的两位数！')
+          }
+      },
+
+      submitScore() {
+          let re = /^([1-9]\d|\d)$/;
+          if(re.test(this.formItem.score)){
+              this.commentScore();
+          }else{
+              this.$Message.warning('请输入0~99的两位数！')
+          }
       },
 
       //获取此用户开设的课程列表
@@ -244,6 +269,32 @@
             that.$Message.error('请求错误');
           })
       },
+
+      //教师评分
+      commentScore() {
+            let that = this;
+            let url = that.BaseConfig + '/updateExpReport';
+            that.formItem.updateTime = new Date(that.editTime).getTime();
+            let data = that.formItem;
+            that
+                .$http(url, '', data, 'post')
+                .then(res => {
+                    if(res.data.retCode === 0) {
+                        that.$Message.success('评分完成');
+                        that.$router.push({
+                            path: '/teachManage/experimentReport',
+                            query: {
+                                courseId: that.formItem.courseId,
+                            }
+                        })
+                    } else {
+                        that.$Message.error(res.data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
 
     }
   }

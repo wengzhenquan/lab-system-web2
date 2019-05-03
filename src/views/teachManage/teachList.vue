@@ -1,11 +1,16 @@
 <template>
     <div class="box">
       <div class="search-title">
-        <div style="margin-left: 12px"><Button type="primary" style="height: 33px;margin-bottom: 10px;" @click="isAdd = true" v-if="level === 1">添加课程</Button></div>
+        <div>
+          <div><p>课程名：</p><Input v-model="courseName" style="width: 150px;margin-top: 8px"/></div>
+          <div><p>教师名字：</p><Input v-model="teacherName" style="width: 150px;margin-top: 8px"/></div>
+        </div>
+        <Button type="primary" @click="searchTeach"  style="height: 33px;margin-top: 8px;">搜索</Button>
       </div>
-      <!--<div class="user-manage">-->
-        <!--<div ><Button type="primary" style="height: 33px;margin-bottom: 10px;" @click="isAdd = true" v-if="level === 1">添加课程</Button></div>-->
-      <!--</div>-->
+      <div class="user-manage">
+        <!--<Button type="primary" style="height: 33px;" @click="isAdd = true" v-if="level === 1">添加课程</Button>-->
+        <Button type="success" style="height: 33px;" @click="getMyInfo" v-if="level === 1">只看自己</Button>
+      </div>
       <div class="col" style="margin-top: 12px">
         <Table border ref="selection" :columns="columns4" :data="courceList" v-if="level === 1"></Table>
         <Table border ref="selection" :columns="columnsS" :data="courceList" v-if="level === 3"></Table>
@@ -77,6 +82,22 @@
           </Form>
         </div>
       </Modal>
+
+      <Modal v-model="modal5" width="360">
+        <p slot="header" style="color:#f60;text-align:center">
+          <Icon type="ios-information-circle"></Icon>
+          <span>确认删除</span>
+        </p>
+        <div style="text-align:center">
+          <p>实验任务共有：{{courseInfoCount.expTeskCount}}</p>
+          <p>实验报告共有：{{courseInfoCount.expReportCount}}</p>
+          <p>学生人数：{{courseInfoCount.studentCount}}</p>
+          <p>确认删除该课程?</p>
+        </div>
+        <div slot="footer">
+          <Button type="error" size="large" long @click="del">删除</Button>
+        </div>
+      </Modal>
     </div>
 </template>
 
@@ -88,6 +109,9 @@
               courceList: [],     //课程列表
               pageNo: 1,
               total: 0,
+              courseName: '',
+              teacherName: '',
+              modal5: false,
               columns4: [
                 {
                   title: '课程名',
@@ -160,19 +184,38 @@
                       h('Button', {
                         props: {
                           type: 'primary',
-                          size: 'small'
+                          size: 'small',
+                          disabled: params.row.teacherUserId !== JSON.parse(localStorage.getItem('loginInfo')).userId ? 'true': false
                         },
                         style: {
                           marginRight: '5px'
                         },
                         on: {
                           click: () => {
+                              console.log(params.row.teacherUserId)
                             this.isEdit = true;
                             this.formItem.id = params.row.id;
                             this.getEditItem();
                           }
                         }
                       }, '编辑'),
+                        h('Button', {
+                            props: {
+                                type: 'error',
+                                size: 'small',
+                                disabled: params.row.teacherUserId !== JSON.parse(localStorage.getItem('loginInfo')).userId ? 'true': false
+                            },
+                            style: {
+                                marginRight: '5px'
+                            },
+                            on: {
+                                click: () => {
+                                    // console.log(params.row)
+                                    this.modal5 =true;
+                                    this.getCourInfoCount(params.row.id);
+                                }
+                            }
+                        }, '删除'),
                     ]);
                   }
                 }
@@ -233,6 +276,8 @@
                 teacherUserId: null,
               },
               level: null,      //0-管理员  1-教师  2-设备管理员  3-学生
+              courseInfoCount: [],
+              courseId: null,
             }
         },
 
@@ -240,8 +285,6 @@
           this.level = parseInt(this.Cookies.get('access'));
           if(this.level === 1) {
             this.formItem.teacherUserId = JSON.parse(localStorage.getItem('loginInfo')).userId;
-
-              console.log(this.formItem.teacherUserId)
           }
           this.getCourceList();
       },
@@ -252,23 +295,27 @@
             this.pageNo = val;
             this.getCourceList();
           },
+
+            searchTeach() {
+              this.pageNo = 1;
+              this.getCourceList();
+            },
+
+            getMyInfo() {
+              this.pageNo = 1;
+                this.getMyCourceList();
+            },
+
           //获取课程列表
           getCourceList() {
             let that = this;
             let url = that.BaseConfig + '/selectCourseAll';
-            let params;
-            if(that.level === 1) {    //教师只查看自己的课程
-              params = {
+            let params = {
+                courseName: that.courseName,
+                teacherName: that.teacherName,
                 pageNo: that.pageNo,
                 pageSize: 10,
-                teacherUserId: that.formItem.teacherUserId
-              };
-            } else {     //除教师外可查看全部课程
-              params = {
-                pageNo: that.pageNo,
-                pageSize: 10,
-              };
-            }
+            };
             let data = null;
             that
               .$http(url, params, data, 'get')
@@ -284,6 +331,31 @@
               .catch(err => {
                 that.$Message.error('请求错误');
               })
+          },
+
+          getMyCourceList() {
+              let that = this;
+              let url = that.BaseConfig + '/selectCourseAll';
+              let params = {
+                  teacherUserId: that.formItem.teacherUserId,
+                  pageNo: that.pageNo,
+                  pageSize: 10,
+              };
+              let data = null;
+              that
+                  .$http(url, params, data, 'get')
+                  .then(res => {
+                      data = res.data;
+                      if(data.retCode === 0) {
+                          that.courceList = data.data.data;
+                          that.total = data.data.total;
+                      } else {
+                          that.$Message.error(data.retMsg);
+                      }
+                  })
+                  .catch(err => {
+                      that.$Message.error('请求错误');
+                  })
           },
 
           //添加课程
@@ -354,13 +426,54 @@
                 that.$Message.error('请求错误');
               })
           },
+
+            //删除前获取相关数据
+            getCourInfoCount(courseId) {
+                let that = this;
+                this.courseId = courseId;
+                let url = that.BaseConfig + '/getCourseInfoCount';
+                let params = {
+                    courseId : courseId,
+                };
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                            this.courseInfoCount = data.data;
+                            console.log(this.courseInfoCount)
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
+            del() {
+                let that = this;
+                let url = that.BaseConfig + '/deleteCourse';
+                let params = {
+                    courseId : that.courseId,
+                };
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                           this.$Message.success('课程删除成功！');
+                           that.modal5 = false;
+                           that.getCourceList();
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
         }
     }
 </script>
 
 <style lang="less" scoped>
-  .user-manage {
-    display: flex;
-    justify-content: flex-end;
-  }
 </style>

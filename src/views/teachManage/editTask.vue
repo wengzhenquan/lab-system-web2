@@ -18,9 +18,9 @@
           </Select>
         </FormItem>
         <FormItem label="实验教室：">
-          <Input v-model="formItem.romName" style="width: 187px;margin-right: 10px" readonly></Input>
-          <a href="" v-if="formItem.romId === null">申请教室</a>
-          <a href="" v-else>更换教室</a>
+          <Input v-model="formItem.romId" style="width: 187px;margin-right: 10px" disabled></Input>
+          <Button type="primary" @click="modal7 = true">选择教室</Button>
+          <!--<a href="" v-if="formItem.romId === null">申请教室</a>-->
         </FormItem>
         <FormItem label="开始时间：">
           <Row>
@@ -54,6 +54,17 @@
           <Button>取消</Button>
         </Poptip>
       </div>
+      <div>
+        <Modal
+                v-model="modal7"
+                title="添加实验任务"
+                :footer-hide="true"
+        >
+          <div style="padding: 12px">
+            <Table border ref="selection" :columns="columnsS" :data="romsList"></Table>
+          </div>
+        </Modal>
+      </div>
     </div>
 </template>
 
@@ -61,6 +72,9 @@
   export default {
     data() {
       return {
+          modal7: false,
+          pageNo2: 1,
+          romsList: [],
         expTeskId : null,
         editorOption:{},
         pageNo: 1,
@@ -79,13 +93,55 @@
           endTime: '',
           fileUrl: '',
         },
+          columnsS: [
+              {
+                  title: '教室ID',
+                  key: 'id'
+              },
+              {
+                  title: '教室编号',
+                  key: 'numb'
+              },
+              {
+                  title: '教室名',
+                  key: 'romName'
+              },
+              {
+                  title: '操作',
+                  key: 'action',
+                  width: 140,
+                  align: 'center',
+                  render: (h, params) => {
+                      return h('div', [
+                          h('Button', {
+                              props: {
+                                  type: 'primary',
+                                  size: 'small'
+                              },
+                              style: {
+                                  marginRight: '5px'
+                              },
+                              on: {
+                                  click: () => {
+                                      this.formItem.romId = params.row.id;
+                                      this.modal7 = false;
+                                  }
+                              }
+                          }, '选择'),
+                      ]);
+                  }
+              }
+          ],
+          loginInfo: [],
       }
     },
 
     created() {
       this.expTeskId  = this.$route.query.expTeskId ;
+      this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
       this.getTaskInfo();
       this.getCourceList();
+        this.getRomsList();
     },
 
     methods: {
@@ -122,7 +178,7 @@
         let params = {
           pageNo: that.pageNo,
           pageSize: 10,
-          teacherUserId: that.$store.state.loginInfo.userId,
+          teacherUserId: that.loginInfo.userId,
         };
         let data = null;
         that
@@ -150,6 +206,31 @@
             that.$Message.error('请求错误');
           })
       },
+
+        //获取-实验室列表
+        getRomsList() {
+            let that = this;
+            let url = that.BaseConfig + '/selectRomsAll';
+            let params = {
+                pageNo: that.pageNo2,
+                pageSize: 10,
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    if(res.data.retCode === 0) {
+                        that.romsList = that.romsList.concat(res.data.data.data);
+                        if (that.romsList.length < res.data.data.data.total) {
+                            that.pageNo2++;
+                            that.getRomsList();
+                        }
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
 
       //修改实验任务
       editTask() {
@@ -197,9 +278,14 @@
   }
 </script>
 
-<style scoped>
+<style lang="less" scoped>
   /deep/ .ql-toolbar.ql-snow + .ql-container.ql-snow {
     height: 180px;
+    overflow-y: scroll;
+  }
+  /deep/ .ivu-modal-body {
+    height: 300px;
+    overflow: hidden;
     overflow-y: scroll;
   }
 </style>

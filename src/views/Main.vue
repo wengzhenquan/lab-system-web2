@@ -21,9 +21,13 @@
         <div class="main-header-con" :style="{paddingLeft: shrink?'0':'200px'}">
             <div class="main-header">
                 <div class="icon-header" @click="toggleClick"><i class="iconfont">&#xe627;</i></div>
-                <div style="width: 96%">
-                    <p style="font-size: 14px;line-height: 64px">
+                <div style="width: 96%;display: flex;justify-content: space-between">
+                    <p style="font-size: 14px;line-height: 64px;letter-spacing: 1px">
                         <span style="padding-right: 10px">{{nowTime}}</span>
+                        <!--欢迎"{{loginInfo.name}}"登录 &nbsp;-->
+                        <!--您的身份是:{{loginInfo.identityName}}-->
+                    </p>
+                    <p style="font-size: 14px;line-height: 64px;letter-spacing: 2px">
                         欢迎"{{loginInfo.name}}"登录 &nbsp;
                         您的身份是:{{loginInfo.identityName}}
                     </p>
