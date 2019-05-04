@@ -20,7 +20,8 @@
         <Button type="primary" style="height: 33px;margin-top: 10px;">添加实验任务</Button>
       </Router-link>
     </div>
-    <Table border ref="selection" :columns="columns4" :data="taskList"></Table>
+    <Table border ref="selection" :columns="columns4" :data="taskList" v-if="level === 1"></Table>
+    <Table border ref="selection" :columns="columnsS" :data="taskList" v-if="level !== 1"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
       <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
     </div>
@@ -211,6 +212,83 @@
             }
           }
         ],
+          columnsS: [
+              {
+                  title: '实验题目',
+                  key: 'title',
+                  align: 'center',
+              },
+              {
+                  title: '内容',
+                  align: 'center',
+                  render: (h, params) => {
+                      return h('div', [
+                          h('p', {
+                              style: {
+                                  color: '#2d8cf0'
+                              },
+                              on: {
+                                  click: () => {
+                                      this.$router.push({
+                                          path: '/taskInfo',
+                                          query: {
+                                              expTeskId: params.row.id
+                                          }
+                                      });
+                                  }
+                              }
+                          }, '查看'),
+                      ]);
+                  }
+              },
+              {
+                  title: '教室名称',
+                  key: 'romName',
+                  align: 'center',
+              },
+              {
+                  title: '开始时间',
+                  key: 'startTime',
+                  align: 'center',
+              },
+              {
+                  title: '结束时间',
+                  key: 'endTime',
+                  align: 'center',
+              },
+              {
+                  title: '实验报告',
+                  align: 'center',
+                  render: (h, params) => {
+                      return h('div', [
+                          h('p', {
+                              style: {
+                                  color: '#2d8cf0'
+                              },
+                              on: {
+                                  click: () => {
+                                      if(parseInt(this.Cookies.get('access')) === 3) {
+                                          this.$router.push({
+                                              path: '/addReport',
+                                              query: {
+                                                  taskId: params.row.id,
+                                              }
+                                          })
+                                      } else {
+                                          this.$Message.warning('学生才可进行提交操作')
+                                      }
+                                  }
+                              }
+                          }, '去提交'),
+                      ]);
+                  }
+              },
+              {
+                  title: '课程名',
+                  key: 'courseName',
+                  align: 'center',
+              },
+          ],
       }
     },
 
@@ -219,12 +297,14 @@
       this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
       this.level = parseInt(this.Cookies.get('access'));
       this.formItem.courseId = this.$route.query.courseId;
+      this.getCourceList();
       if((this.formItem.courseId === undefined || this.formItem.courseId === null)&& this.level === 1)  {
         this.$Message.warning('请先选择课程名称');
+      } else if(this.level !== 1){
+          this.getStuTaskList();
       } else {
-        this.getTaskList();
+          this.getTaskList();
       }
-      this.getCourceList();
     },
 
     methods: {
@@ -252,6 +332,7 @@
           }
         } else {
           params = {
+            studentId:that.loginInfo.userId,
             pageNo: that.pageNo1,
             pageSize: 10,
           }
@@ -287,21 +368,15 @@
       getTaskList() {
         let that = this;
         let url = that.BaseConfig + '/selectExpTeskAll';
-        let params;
-        if(that.level === 1 || (this.formItem.courseId !== undefined && this.formItem.courseId !== null)) {
-          params = {
+        let courseId;
+          this.formItem.courseId === null ? courseId = '': courseId=this.formItem.courseId;
+          this.formItem.courseId === undefined ? courseId = '': courseId=this.formItem.courseId;
+        let params = {
             romName: that.romName,
-            courseId: that.formItem.courseId,
+            courseId: courseId,
             pageNo: that.pageNo,
             pageSize: 10,
-          }
-        } else {
-          params = {
-            romName: that.romName,
-            pageNo: that.pageNo,
-            pageSize: 10,
-          }
-        }
+        };
         let data = null;
         that
           .$http(url, params, data, 'get')
@@ -318,6 +393,37 @@
             that.$Message.error('请求错误');
           })
       },
+
+        //获取学生实验任务列表
+        getStuTaskList() {
+            let that = this;
+            let url = that.BaseConfig + '/selectExpTeskAll';
+            let courseId;
+            this.formItem.courseId === null ? courseId = '': courseId=this.formItem.courseId;
+            this.formItem.courseId === undefined ? courseId = '': courseId=this.formItem.courseId;
+            let params = {
+                studentId: that.loginInfo.userId,
+                romName: that.romName,
+                courseId: courseId,
+                pageNo: that.pageNo,
+                pageSize: 10,
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    data = res.data;
+                    if(data.retCode === 0) {
+                        that.taskList = data.data.data;
+                        that.total = data.data.total;
+                    } else {
+                        that.$Message.error(data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
 
         getInfoCount(id) {
             let that = this;

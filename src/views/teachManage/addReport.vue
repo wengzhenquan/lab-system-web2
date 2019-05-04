@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="box">
       <quill-editor
         v-model="formItem.content"
         ref="myQuillEditor"
@@ -39,7 +39,7 @@
         formItem: {
           teskId: null,
           courseId: null,
-          studentUserId: this.$store.state.loginInfo.userId,
+          studentUserId: JSON.parse(localStorage.getItem('loginInfo')).userId,
           studentFileUrl: '',
           content: '',
           updateTime: new Date().getTime(),
@@ -49,8 +49,7 @@
 
     created() {
       this.formItem.teskId = this.$route.query.taskId;
-      this.formItem.courseId = this.$route.query.courseId;
-      this.formItem.content = this.$route.query.content;
+      this.getTaskInfo();
     },
 
     methods: {
@@ -58,6 +57,30 @@
       handleSuccess (res, file) {
         this.formItem.studentFileUrl = res.data;
       },
+
+        getTaskInfo() {
+            let that = this;
+            let url = that.BaseConfig + '/selectExpTeskById';
+            let params = {
+                expTeskId:this.formItem.teskId
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    data = res.data;
+                    if(data.retCode === 0) {
+                        this.formItem.taskId = data.data.id;
+                        this.formItem.courseId = data.data.courseId;
+                        this.formItem.content = data.data.content;
+                    } else {
+                        that.$Message.error(data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
 
       //提交实验报告
       addReport() {
@@ -73,7 +96,7 @@
               if(res.data.retCode === 0) {
                 that.$Message.success('提交实验报告成功');
                 that.$router.push({
-                  path: './experimentReport',
+                  path: '/teachManage/experimentReportS',
                 })
               }
             })
@@ -87,7 +110,7 @@
       //清空实验报告并返回上一级
       ok() {
        this.$router.push({
-         path: '/experimentTask',
+         path: '/teachManage/experimentReportS',
          query: {
            courseId: this.formItem.courseId
          }

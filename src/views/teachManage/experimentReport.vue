@@ -20,7 +20,8 @@
       <Button type="primary" @click="searchReport"  style="height: 33px;margin-top: 8px;">搜索</Button>
     </div>
 
-    <Table border ref="selection" :columns="columns4" :data="reportList"></Table>
+    <Table border ref="selection" :columns="columns4" :data="reportList" v-if="level === 1"></Table>
+    <Table border ref="selection" :columns="columnsS" :data="reportList" v-if="level !== 1"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: flex-end">
       <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
     </div>
@@ -59,7 +60,8 @@
         columns4: [
           {
             title: '任务标题',
-            key: 'title'
+            key: 'title',
+            align: 'center',
           },
           {
             title: '报告内容',
@@ -86,23 +88,29 @@
           },
           {
             title: '所属课程',
-            key: 'courseName'
+            key: 'courseName',
+            align: 'center',
           },
           {
             title: '提交时间',
-            key: 'updateTime'
+            key: 'updateTime',
+            align: 'center',
           },
           {
             title: '学生',
-            key: 'name'
+            key: 'name',
+            align: 'center',
           },
           {
             title: '实验分',
             key: 'score',
+            align: 'center',
           },
           {
             title: '操作',
             key: 'action',
+            align: 'center',
+            width: 180,
             render: (h, params) => {
               return h('div', [
                 h('Button', {
@@ -112,7 +120,6 @@
                   },
                   style: {
                     marginRight: '5px',
-                    display: this.level === 1?'block':'none',
                   },
                   on: {
                     click: () => {
@@ -121,30 +128,103 @@
                     }
                   }
                 }, '评分'),
-                h('Button', {
-                  props: {
-                    type: 'primary',
-                    size: 'small'
-                  },
-                  style: {
-                    marginRight: '5px',
-                    display: this.level === 3?'block':'none',
-                  },
-                  on: {
-                    click: () => {
-                      this.$router.push({
-                        path: './editReport',
-                        query: {
-                          expReportId: params.row.id,
-                        }
-                      })
-                    }
-                  }
-                }, '修改'),
               ]);
             }
           }
         ],
+        columnsS: [
+              {
+                  title: '任务标题',
+                  key: 'title',
+                  align: 'center',
+              },
+              {
+                  title: '报告内容',
+                  align: 'center',
+                  render: (h, params) => {
+                      return h('div', [
+                          h('p', {
+                              style: {
+                                  color: '#2d8cf0',
+                              },
+                              on: {
+                                  click: () => {
+                                      this.$router.push({
+                                          path: '/reportInfo',
+                                          query: {
+                                              expReportId: params.row.id
+                                          }
+                                      });
+                                  }
+                              }
+                          }, '查看'),
+                      ]);
+                  }
+              },
+              {
+                  title: '所属课程',
+                  key: 'courseName',
+                  align: 'center',
+              },
+              {
+                  title: '提交时间',
+                  key: 'updateTime',
+                  align: 'center',
+              },
+              {
+                  title: '学生',
+                  key: 'name',
+                  align: 'center',
+              },
+              {
+                  title: '实验分',
+                  key: 'score',
+                  align: 'center',
+              },
+              {
+                  title: '操作',
+                  key: 'action',
+                  align: 'center',
+                  width: 180,
+                  render: (h, params) => {
+                      return h('div', [
+                          h('Button', {
+                              props: {
+                                  type: 'primary',
+                                  size: 'small'
+                              },
+                              style: {
+                                  marginRight: '5px',
+                              },
+                              on: {
+                                  click: () => {
+                                      this.$router.push({
+                                          path: '/editReport',
+                                          query: {
+                                              expReportId: params.row.id,
+                                          }
+                                      })
+                                  }
+                              }
+                          }, '修改'),
+                          h('Button', {
+                              props: {
+                                  type: 'error',
+                                  size: 'small'
+                              },
+                              style: {
+                                  marginRight: '5px',
+                              },
+                              on: {
+                                  click: () => {
+                                      this.del(params.row.id)
+                                  }
+                              }
+                          }, '删除'),
+                      ]);
+                  }
+              }
+          ],
       }
     },
 
@@ -154,6 +234,7 @@
       this.formItem.studentUserId = this.loginInfo.userId;
       this.formItem.courseId = this.$route.query.courseId;
       this.level = parseInt(this.Cookies.get('access'));
+        this.getCourceList();
       if(this.level === 3) {
         this.getReportList();
       } else if(this.formItem.courseId !== undefined && this.formItem.courseId !== null) {
@@ -161,7 +242,6 @@
       } else {
         this.$Message.warning('请选择课程名称');
       }
-      this.getCourceList();
     },
 
     methods: {
@@ -194,11 +274,20 @@
       getCourceList() {
         let that = this;
         let url = that.BaseConfig + '/selectCourseAll';
-        let params = {
-          pageNo: that.pageNo1,
-          pageSize: 10,
-          teacherUserId: that.loginInfo.userId,
-        };
+        let params;
+          if(this.level === 1) {
+              params = {
+                  pageNo: that.pageNo1,
+                  pageSize: 10,
+                  teacherUserId: that.loginInfo.userId,
+              }
+          } else {
+              params = {
+                  studentId:that.loginInfo.userId,
+                  pageNo: that.pageNo1,
+                  pageSize: 10,
+              }
+          }
         let data = null;
         that
           .$http(url, params, data, 'get')
@@ -287,6 +376,27 @@
                                 courseId: that.formItem.courseId,
                             }
                         })
+                    } else {
+                        that.$Message.error(res.data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
+
+        del(id) {
+            let that = this;
+            let url = that.BaseConfig + '/deleteExpReport';
+            let params = {
+                expReportId: id,
+            };
+            that
+                .$http(url, params, '', 'get')
+                .then(res => {
+                    if(res.data.retCode === 0) {
+                        that.$Message.success('报告删除成功！');
+                        this.getReportList();
                     } else {
                         that.$Message.error(res.data.retMsg);
                     }

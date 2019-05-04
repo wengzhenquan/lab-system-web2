@@ -7,7 +7,7 @@
       >
       </quill-editor>
       <div style="margin:10px">
-        附件：{{formItem.studentFileUrl}}
+        附件：{{fileUrl}}
         <!--重新上传按钮仅学生可见-->
         <Upload
           :action="upUrl"
@@ -47,6 +47,7 @@
       return {
         expReportId: null,
         editorOption:{},
+        fileUrl: '',
         isComment: false,       //评分模态框
         upUrl: this.BaseConfig + '/fileUpload',     // 上传文件传入地址
         level: null,
@@ -90,6 +91,9 @@
             if(data.retCode === 0) {
               that.formItem = data.data;
               that.editTime = this.formItem.updateTime;
+                let a = this.formItem.studentFileUrl;
+                let index = a.lastIndexOf('\/');
+                this.fileUrl = a.substring(index+1, a.length);
             } else {
               that.$Message.error(data.retMsg);
             }
@@ -111,7 +115,7 @@
             if(res.data.retCode === 0) {
               that.$Message.success('修改成功');
               that.$router.push({
-                path: '/teachManage/experimentReport',
+                path: '/teachManage/experimentReportS',
               })
             } else {
               that.$Message.error(res.data.retMsg);

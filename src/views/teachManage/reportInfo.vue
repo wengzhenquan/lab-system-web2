@@ -118,12 +118,22 @@
 
       //返回上一级
       goBack() {
-        this.$router.push({
-          path: '/teachManage/experimentReport',
-          query: {
-            courseId: this.formItem.courseId,
+          if(this.level === 1) {
+              this.$router.push({
+                  path: '/teachManage/experimentReport',
+                  query: {
+                      courseId: this.formItem.courseId,
+                  }
+              })
+          } else {
+              this.$router.push({
+                  path: '/teachManage/experimentReportS',
+                  query: {
+                      courseId: this.formItem.courseId,
+                  }
+              })
           }
-        })
+
       },
 
         //数字正则

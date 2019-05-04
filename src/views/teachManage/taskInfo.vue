@@ -18,6 +18,7 @@
     data() {
       return {
         fileUrl: '',
+          level: null,
         expTeskId : null,
         editorOption:{},
         startTime: '',
@@ -36,6 +37,7 @@
 
     created() {
       this.expTeskId  = this.$route.query.expTeskId ;
+      this.level = parseInt(this.Cookies.get('access'));
       this.getTaskInfo();
 
     },
@@ -76,12 +78,22 @@
 
       //返回上一级
       goBack() {
-        this.$router.push({
-          path: '/teachManage/experimentTask',
-          query: {
-            courseId: this.formItem.courseId,
+          if(this.level === 1) {
+              this.$router.push({
+                  path: '/teachManage/experimentTask',
+                  query: {
+                      courseId: this.formItem.courseId,
+                  }
+              })
+          } else {
+              this.$router.push({
+                  path: '/teachManage/experimentTaskS',
+                  query: {
+                      courseId: this.formItem.courseId,
+                  }
+              })
           }
-        })
+
       },
     }
   }

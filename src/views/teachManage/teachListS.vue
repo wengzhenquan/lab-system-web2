@@ -22,7 +22,7 @@
         </TabPane>
         <TabPane label="已选课程">
           <div class="col" style="margin-top: 12px">
-            <Table border ref="selection" :columns="columnsS" :data="courceList" v-if="level === 3"></Table>
+            <Table border ref="selection" :columns="columns4" :data="courceList" v-if="level === 3"></Table>
           </div>
           <div style="margin-top: 20px; display: flex;justify-content: flex-end">
             <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
@@ -128,6 +128,10 @@
                   title: '课程名',
                   key: 'courseName'
                 },
+                  {
+                      title: '课任老师',
+                      key: 'name',
+                  },
                 {
                   title: '学分',
                   key: 'totalScore'
@@ -152,30 +156,7 @@
                         on: {
                           click: () => {
                             this.$router.push({
-                              path: './experimentTask',
-                              query: {
-                                courseId: params.row.id,
-                              }
-                            })
-                          }
-                        }
-                      }, '查看'),
-                    ])
-                  }
-                },
-                {
-                  title: '学生',
-                  align: 'center',
-                  render: (h, params) => {
-                    return h('div', [
-                      h('p', {
-                        style: {
-                          color: '#2d8cf0'
-                        },
-                        on: {
-                          click: () => {
-                            this.$router.push({
-                              path: './studentManage',
+                              path: '/teachManage/experimentTaskS',
                               query: {
                                 courseId: params.row.id,
                               }
@@ -236,6 +217,10 @@
                   title: '课程名',
                   key: 'courseName'
                 },
+                  {
+                      title: '课任老师',
+                      key: 'name',
+                  },
                 {
                   title: '学分',
                   key: 'totalScore'
@@ -247,10 +232,6 @@
                 {
                   title: '结束时间',
                   key: 'endDate'
-                },
-                {
-                  title: '课任老师',
-                  key: 'name',
                 },
               ],
               isAdd: false,
@@ -298,7 +279,7 @@
 
             getMyInfo() {
               this.pageNo = 1;
-                this.getMyCourceList();
+              this.getMyCourceList();
             },
 
           //获取课程列表
@@ -330,9 +311,11 @@
 
           getMyCourceList() {
               let that = this;
-              let url = that.BaseConfig + '/selectCourseAllBy';
+              let url = that.BaseConfig + '/selectCourseAll';
               let params = {
-                  studentId: that.formItem.studentId,
+                  courseName: that.courseName,
+                  teacherName: that.teacherName,
+                  studentId: this.formItem.studentId,
                   pageNo: that.pageNo,
                   pageSize: 10,
               };
