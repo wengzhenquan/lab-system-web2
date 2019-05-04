@@ -171,7 +171,11 @@ export default {
         backLogin() {   //退出系统
            this.Cookies.remove('token');
            this.Cookies.remove('access');
-           localStorage.removeItem('loginInfo')
+           localStorage.removeItem('loginInfo');
+            this.$store.commit('clearAllTags');
+            this.$router.push({
+                name: 'home_index'
+            });
            this.$router.push({name: 'login'})
         },
 
