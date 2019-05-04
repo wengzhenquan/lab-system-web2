@@ -6,8 +6,8 @@
     <p>提交时间：{{formItem.updateTime}}</p>
     <p>学生：{{formItem.name}}</p>
     <p>得分：{{formItem.score}}</p>
-    <p v-if="!formItem.studentFileUrl">福建报告：无</p>
-    <p v-if="formItem.studentFileUrl">福建报告：<a :href="formItem.studentFileUrl" style="padding-left: 10px">
+    <p v-if="!formItem.studentFileUrl">附件报告：无</p>
+    <p v-if="formItem.studentFileUrl">附件报告：<a :href="formItem.studentFileUrl" style="padding-left: 10px">
       {{studentFileUrl}}</a>
     </p>
     <div style="margin-top: 10px">

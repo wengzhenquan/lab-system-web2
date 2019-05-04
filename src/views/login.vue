@@ -25,7 +25,7 @@
               <Radio label="系统管理员"></Radio>
             </RadioGroup>
           </div>
-          <p><span style="color: #2d78f4" @click="isRegister = true">免费注册</span><span>忘记密码？</span></p>
+          <p><span></span><span style="color: #2d78f4" @click="isRegister = true">免费注册</span></p>
         </div>
       </div>
 
@@ -41,7 +41,7 @@
         @on-ok="registerUser('registerInfo')"
       >
         <div>
-          <Form ref="registerInfo" :model="registerInfo" :rules="ruleCustom" :label-width="80">
+          <Form ref="registerInfo" :model="registerInfo" :rules="ruleCustom" :label-width="100">
             <FormItem label="账户：" prop="userName">
               <Input v-model="registerInfo.userName" style="width:200px"></Input>
             </FormItem>
@@ -167,6 +167,13 @@
                       that.$Message.success('注册成功');
                       setTimeout(()=> {
                         that.isRegister = false;
+                          this.registerInfo= {
+                              userName: '',
+                              name: '',
+                              pwd:'',
+                              identityId: 4,
+                              passwdCheck: '',
+                          };
                       },800)
                     } else {
                       that.$Message.error(res.data.retMsg);
