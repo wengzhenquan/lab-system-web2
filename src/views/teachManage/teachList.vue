@@ -8,7 +8,7 @@
         <Button type="primary" @click="searchTeach"  style="height: 33px;margin-top: 8px;">搜索</Button>
       </div>
       <div class="user-manage">
-        <!--<Button type="primary" style="height: 33px;" @click="isAdd = true" v-if="level === 1">添加课程</Button>-->
+        <Button type="primary" style="height: 33px;" @click="isAdd = true" v-if="level === 1">添加课程</Button>
         <Button type="success" style="height: 33px;" @click="getMyInfo" v-if="level === 1">只看自己</Button>
       </div>
       <div class="col" style="margin-top: 12px">
@@ -117,6 +117,10 @@
                   title: '课程名',
                   key: 'courseName'
                 },
+                  {
+                      title: '课任老师',
+                      key: 'name'
+                  },
                 {
                   title: '学分',
                   key: 'totalScore'

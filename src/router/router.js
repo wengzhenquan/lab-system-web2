@@ -93,6 +93,12 @@ export const otherRouter = {
             name: "editReport",
             component: () => import("@/views/teachManage/editReport.vue")
         },
+        {
+            path: "applyInfo",
+            title: "申请详情",
+            name: "applyInfo",
+            component: () => import("@/views/deviceManage/applyInfo.vue")
+        },
     ]
 };
 
@@ -224,14 +230,14 @@ export const appRouter = [
                 access: 2,
                 component: () => import("@/views/deviceManage/deviceManage")
             },
-            // {
-            //     path: "repairApplyD",
-            //     icon: "i iconfont icon-guanli",
-            //     title: "设备报修申请",
-            //     name: "repairApplyD",
-            //     access: 2,
-            //     component: () => import("@/views/deviceManage/repairApply")
-            // },
+            {
+                path: "applyManageD",
+                icon: "i iconfont icon-guanli",
+                title: "设备申请",
+                name: "applyManageD",
+                access: 2,
+                component: () => import("@/views/deviceManage/applyManage")
+            },
         ]
     },
     {

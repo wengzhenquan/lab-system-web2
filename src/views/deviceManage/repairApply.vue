@@ -67,6 +67,22 @@
                 </Form>
             </div>
         </Modal>
+
+        <Modal
+                v-model="modal7"
+                title="设备报修申请详情"
+                :footer-hide="true">
+            <div class="apply-info">
+                <p>申请标题：{{equipmentInfo.title}}</p>
+                <p>申请人：{{equipmentInfo.applyName}}</p>
+                <p>设备类型：{{equipmentInfo.typeName}}</p>
+                <div style="display: flex"> <p>申请需求：</p><p>{{equipmentInfo.need}}</p></div>
+                <div style="display: flex"> <p>处理结果：</p><p>{{equipmentInfo.result}}</p></div>
+                <p>处理人：{{equipmentInfo.handleUserName}}</p>
+                <p>申请时间：{{equipmentInfo.creatTime}}</p>
+                <p>申请时间：{{equipmentInfo.handleTime}}</p>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -98,6 +114,8 @@
                 eqList: [],
                 selectEq: [],
                 eqClassId: -1,
+                equipmentInfo: [],
+                modal7: false,
                 selectEq1: [
                     {
                         value: -1,
@@ -105,6 +123,11 @@
                     }
                 ],
                 columns: [
+                    {
+                        title: '序号',
+                        type: 'index',
+                        align: 'center'
+                    },
                     {
                         title: '标题',
                         key: 'title',
@@ -121,42 +144,61 @@
                         align: 'center'
                     },
                     {
-                        title: '申请需求',
-                        key: 'need',
-                        align: 'center'
-                    },
-                    {
                         title: '申请状态',   // 0 - 审核中，1-已审批， 2-已处理
                         key: 'state',
                         align: 'center',
+                        width: 100,
                         render: (h,params) => {
                             return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '已处理'))
                         }
                     },
                     {
-                        title: '申请结果',
-                        key: 'result',
-                        align: 'center'
-                    },
-                    {
                         title: '处理人',
                         key: 'handleUserName',
-                        align: 'center'
+                        align: 'center',
+                        render: (h,params)=> {
+                            return h('p',params.row.handleUserName  === null ? '— —' : params.row.handleUserName )
+                        }
                     },
                     {
                         title: '处理时间',
                         key: 'handleTime',
-                        align: 'center'
+                        align: 'center',
+                        render: (h,params)=> {
+                            return h('p',params.row.handleTime  === null ? '— —' : params.row.handleTime )
+                        }
                     },
                     {
                         title: '操作',
                         key: 'action',
                         align: 'center',
+                        width: 180,
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {
                                     props: {
                                         type: 'primary',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.getEquipment(params.row.id);
+                                            this.modal7 = true;
+                                            // this.$router.push({
+                                            //     path: '/applyInfo',
+                                            //     query: {
+                                            //         equipmentLogId: params.row.id
+                                            //     }
+                                            // })
+                                        }
+                                    }
+                                }, '查看'),
+                                h('Button', {
+                                    props: {
+                                        type: 'success',
                                         size: 'small'
                                     },
                                     style: {
@@ -359,9 +401,40 @@
                     })
             },
 
+            getEquipment(id) {
+                let that = this;
+                let url = that.BaseConfig + '/selectEquipmentLoById';
+                let params ={
+                    equipmentLogId:id,
+                }
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                            that.equipmentInfo = data.data;
+                        } else {
+                            that.$Message.error(data.retMsg);
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
         },
     }
 </script>
 
 <style lang="less" scoped>
+    .apply-info {
+        color: #000;
+        font-size: 15px;
+        letter-spacing: 1px;
+        padding-left: 12px;
+        p {
+            line-height: 35px;
+        }
+    }
 </style>

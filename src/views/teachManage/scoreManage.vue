@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="search-title" style="margin-bottom: 10px">
+    <div class="search-title" style="margin-bottom: 10px" v-if="level === 1">
       <div>
         <div>
           <p>课程名称：</p>
@@ -61,6 +61,7 @@
                 title: '序号',
                 type: 'index',
                 align: 'center',
+                width: 80
             },
           {
             title: '课程名',

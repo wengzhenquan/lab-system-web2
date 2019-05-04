@@ -121,6 +121,10 @@
               pageNo: 1,
               total: 0,
               courseName: '',
+                add: {
+                    teacherId: null,
+                    courseId: null,
+                },
               teacherName: '',
               modal5: false,
               columns4: [
@@ -167,72 +171,65 @@
                     ])
                   }
                 },
-                {
-                  title: '操作',
-                  key: 'action',
-                  align: 'center',
-                  render: (h, params) => {
-                    return h('div', [
-                      h('Button', {
-                        props: {
-                          type: 'primary',
-                          size: 'small',
-                          disabled: params.row.teacherUserId !== JSON.parse(localStorage.getItem('loginInfo')).userId ? 'true': false
-                        },
-                        style: {
-                          marginRight: '5px'
-                        },
-                        on: {
-                          click: () => {
-                              console.log(params.row.teacherUserId)
-                            this.isEdit = true;
-                            this.formItem.id = params.row.id;
-                            this.getEditItem();
-                          }
-                        }
-                      }, '编辑'),
-                        h('Button', {
-                            props: {
-                                type: 'error',
-                                size: 'small',
-                                disabled: params.row.teacherUserId !== JSON.parse(localStorage.getItem('loginInfo')).userId ? 'true': false
-                            },
-                            style: {
-                                marginRight: '5px'
-                            },
-                            on: {
-                                click: () => {
-                                    // console.log(params.row)
-                                    this.modal5 =true;
-                                    this.getCourInfoCount(params.row.id);
-                                }
-                            }
-                        }, '删除'),
-                    ]);
-                  }
-                }
               ],
               columnsS: [
+                  {
+                      title: '序号',
+                      type: 'index',
+                      width:80,
+                      align: 'center'
+                  },
                 {
                   title: '课程名',
-                  key: 'courseName'
+                  key: 'courseName',
+                    align: 'center'
                 },
                   {
                       title: '课任老师',
                       key: 'name',
+                      align: 'center'
                   },
                 {
                   title: '学分',
-                  key: 'totalScore'
+                  key: 'totalScore',
+                    align: 'center',
+                    width: 100
                 },
                 {
                   title: '开始时间',
-                  key: 'startDate'
+                  key: 'startDate',
+                    align: 'center'
                 },
                 {
                   title: '结束时间',
-                  key: 'endDate'
+                  key: 'endDate',
+                    align: 'center'
                 },
+                  {
+                      title: '操作',
+                      key: 'action',
+                      align: 'center',
+                      render: (h, params) => {
+                          return h('div', [
+                              h('Button', {
+                                  props: {
+                                      type: 'primary',
+                                      size: 'small',
+                                  },
+                                  style: {
+                                      marginRight: '5px'
+                                  },
+                                  on: {
+                                      click: () => {
+                                          this.add.courseId = params.row.id;
+                                          this.add.teacherId = params.row.teacherUserId;
+                                          this.insertToCource();
+                                      }
+                                  }
+                              }, '选课'),
+                          ]);
+                      }
+                  }
               ],
               isAdd: false,
               isEdit: false,
@@ -358,6 +355,31 @@
                 that.$Message.error('请求错误');
               })
           },
+
+            //添加学生进课程
+            insertToCource() {
+                let that = this;
+                let url = that.BaseConfig + '/insertStudentToCourse';
+                let params = {
+                    courseId: that.add.courseId,
+                    teacherId: that.add.teacherId,
+                    studentId: JSON.parse(localStorage.getItem('loginInfo')).userId,
+                };
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        data = res.data;
+                        if(data.retCode === 0) {
+                            that.$Message.success('添加成功！')
+                        } else {
+                            that.$Message.error(data.retMsg);
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
 
           //获取单个课程
           getEditItem() {

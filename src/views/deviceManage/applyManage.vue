@@ -19,7 +19,7 @@
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
                 </div>
             </TabPane>
-            <TabPane label="已处理">
+            <TabPane label="未通过">
                 <Table border ref="selection" :columns="columns" :data="applyList"></Table>
                 <div style="margin-top: 20px; display: flex;justify-content: flex-end">
                     <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
@@ -84,7 +84,7 @@
                         key: 'state',
                         align: 'center',
                         render: (h,params) => {
-                            return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '已处理'))
+                            return h('p',params.row.state === 0 ? '申请中' : (params.row.state === 1 ? '已审批': '未通过'))
                         }
                     },
                     {
@@ -149,7 +149,7 @@
         methods: {
             getApplyList(num) {
                 this.pageNo = 1;
-                this.getList(num);
+                this.getList(num-1);
             },
 
             pageChange(val) {},
@@ -161,7 +161,7 @@
                 // let eqClassId;
                 // that.eqClassId === -1 ? eqClassId = '': eqClassId = that.eqClassId;
                 let state;
-                n === 0 ? state = '': state = n;
+                n === -1 ? state = '': state = n;
                 let params ={
                     // eqClassId: eqClassId,
                     // applyName: that.applyName,

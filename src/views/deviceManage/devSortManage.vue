@@ -3,7 +3,7 @@
         <div class="dev-sort">
             <Button type="primary" style="height: 33px;" @click="isAdd = true">添加设备类别</Button>
         </div>
-        <div style="width: 80%">
+        <div>
             <Table border ref="selection" :columns="columns4" :data="devSortList" ></Table>
             <div style="margin-top: 20px; display: flex;justify-content: flex-end">
                 <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
@@ -62,11 +62,13 @@
                 columns4: [
                     {
                         title: '序号',
-                        type: 'index'
+                        type: 'index',
+                        align: 'center'
                     },
                     {
                         title: '设备类别',
-                        key: 'typeName'
+                        key: 'typeName',
+                        align: 'center'
                     },
                     {
                         title: '操作',
