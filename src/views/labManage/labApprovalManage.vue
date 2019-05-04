@@ -196,6 +196,11 @@
                 if(n === 1) {
                     this.changeLab(1);
                 }
+            },editStatus(n) {
+                this.editApplyStatus(n);
+                if(n === 1) {
+                    this.changeLab(1);
+                }
             },
 
             //修改申请状态

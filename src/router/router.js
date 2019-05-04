@@ -159,14 +159,6 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: "devSortManage",
-                icon: "i iconfont icon-guanli",
-                title: "设备分类管理",
-                name: "devSortManage",
-                access: 0,
-                component: () => import("@/views/deviceManage/devSortManage")
-            },
-            {
                 path: "useManage",
                 icon: "i iconfont icon-guanli",
                 title: "使用与分配",
@@ -209,29 +201,37 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: "useManage",
+                path: "useManageD",
                 icon: "i iconfont icon-guanli",
                 title: "使用与分配",
-                name: "useManage",
+                name: "useManageD",
                 access: 2,
                 component: () => import("@/views/deviceManage/useManage")
             },
             {
-                path: "storeManage",
+                path: "storeManageD",
                 icon: "i iconfont icon-guanli",
                 title: "库存管理",
-                name: "storeManage",
+                name: "storeManageD",
                 access: 2,
                 component: () => import("@/views/deviceManage/storeManage")
             },
             {
-                path: "deviceIndex",
+                path: "deviceIndexD",
                 icon: "i iconfont icon-guanli",
                 title: "设备管理",
-                name: "deviceIndex",
+                name: "deviceIndexD",
                 access: 2,
                 component: () => import("@/views/deviceManage/deviceManage")
             },
+            // {
+            //     path: "repairApplyD",
+            //     icon: "i iconfont icon-guanli",
+            //     title: "设备报修申请",
+            //     name: "repairApplyD",
+            //     access: 2,
+            //     component: () => import("@/views/deviceManage/repairApply")
+            // },
         ]
     },
     {
@@ -245,10 +245,10 @@ export const appRouter = [
             {
                 path: "devSortManage",
                 icon: "i iconfont icon-guanli",
-                title: "设备分类",
+                title: "设备分类管理",
                 name: "devSortManage",
                 access: 0,
-                component: () => import("@/views/devPurchase/devSortManage")
+                component: () => import("@/views/deviceManage/devSortManage")
             },
             {
                 path: "purchaseApply",
@@ -269,18 +269,18 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: "devSortManage",
+                path: "devSortManageD",
                 icon: "i iconfont icon-guanli",
                 title: "设备分类",
-                name: "devSortManage",
+                name: "devSortManageD",
                 access:2,
-                component: () => import("@/views/devPurchase/devSortManage")
+                component: () => import("@/views/deviceManage/devSortManage")
             },
             {
-                path: "purchaseApply",
+                path: "purchaseApplyD",
                 icon: "i iconfont icon-guanli",
                 title: "采购申请",
-                name: "purchaseApply",
+                name: "purchaseApplyD",
                 access: 2,
                 component: () => import("@/views/devPurchase/purchaseApply")
             },
@@ -389,34 +389,34 @@ export const appRouter = [
         component: Main,
         children: [
             {
-                path: "teachList",
+                path: "teachListS",
                 icon: "i iconfont icon-guanli",
                 title: "课程管理",
-                name: "teachList",
+                name: "teachListS",
                 access: 3,
-                component: () => import("@/views/teachManage/teachList")
+                component: () => import("@/views/teachManage/teachListS")
             },
             {
-                path: "experimentTask",
+                path: "experimentTaskS",
                 icon: "i iconfont icon-guanli",
                 title: "实验课题",
-                name: "experimentTask",
+                name: "experimentTaskS",
                 access: 3,
                 component: () => import("@/views/teachManage/experimentTask")
             },
             {
-                path: "experimentReport",
+                path: "experimentReportS",
                 icon: "i iconfont icon-guanli",
                 title: "实验报告",
-                name: "experimentReport",
+                name: "experimentReportS",
                 access: 3,
                 component: () => import("@/views/teachManage/experimentReport")
             },
             {
-                path: "scoreManage",
+                path: "scoreManageS",
                 icon: "i iconfont icon-guanli",
                 title: "成绩管理",
-                name: "scoreManage",
+                name: "scoreManageS",
                 access: 3,
                 component: () => import("@/views/teachManage/scoreManage")
             },

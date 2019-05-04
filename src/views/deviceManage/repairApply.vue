@@ -2,7 +2,7 @@
     <div class="box">
         <div class="search-title">
             <div>
-                <div><p>申请人：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="applyName"/></div>
+                <div v-if="level !== 1"><p>申请人：</p><Input placeholder="关键字模糊搜索" style="width: 140px;margin-top: 8px" v-model="applyName"/></div>
                 <div><p>处理人：</p><Input style="width: 140px;margin-top: 8px" v-model="handleUserName"/></div>
                 <div><p>设备类型：</p>
                     <Select v-model="eqClassId" style="width: 140px;margin-top: 8px">
@@ -74,6 +74,7 @@
     export default {
         data() {
             return {
+                level: null,
                 pageNo: 1,pageNo2:1,pageNo1:1,
                 total:0,
                 current: 1,
@@ -158,6 +159,9 @@
                                         type: 'primary',
                                         size: 'small'
                                     },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
                                     on: {
                                         click: () => {
                                             this.equipmentLog = params.row;
@@ -186,6 +190,7 @@
         created() {
             this.getApplyList();
             this.getEqList();
+            this.level = parseInt(this.Cookies.get('access'))
         },
 
         methods: {

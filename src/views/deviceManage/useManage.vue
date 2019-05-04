@@ -151,6 +151,7 @@
                     repairTimes: null,  //维修时间
                 },
                 equipmentId: null,
+                returnEquip: [],
                 columns4: [
                     {
                         title: '编号',
@@ -163,9 +164,15 @@
                         align: 'center',
                     },
                     {
+                        title: '设备名称',
+                        key: 'eqName',
+                        align: 'center'
+                    },
+                    {
                         title: '状态',
                         key: 'state',
                         align: 'center',
+                        width: 80,
                         render: (h,params)=> {
                             return h('p',params.row.state === 0 ? '正常': (params.row.state === 1 ? '报修':'报废'))
                         }
@@ -192,6 +199,7 @@
                         title: '操作',
                         key: 'action',
                         align: 'center',
+                        width: 180,
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {
@@ -221,27 +229,12 @@
                                     },
                                     on: {
                                         click: () => {
-                                            this.modal1 = true;
-                                            this.equipment = params.row;
-                                            this.equipment.state === 0? this.state = '0':(this.equipment.state === 1? this.state = '1':'2')
+                                            console.log(params.row)
+                                            this.returnEquip = params.row;
+                                            this.reEquip();
                                         }
                                     }
-                                }, '分配'),
-                                h('Button', {
-                                    props: {
-                                        type: 'error',
-                                        size: 'small'
-                                    },
-                                    style: {
-                                        marginRight: '5px'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            this.modal2 = true;
-                                            this.equipmentId = params.row.id
-                                        }
-                                    }
-                                }, '删除'),
+                                }, '回收'),
                             ]);
                         }
                     }
@@ -507,6 +500,30 @@
                             that.getDevList();
                         } else {
                             that.$Message.error(data.retMsg);
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
+            },
+
+            reEquip(){
+                let that = this;
+                let url = that.BaseConfig + '/updateEquipment';
+                that.returnEquip.updateTime = new Date().getTime();
+                that.returnEquip.buyTime = new Date(that.returnEquip.buyTime).getTime();
+                that.returnEquip.repairTimes = new Date(that.returnEquip.repairTimes).getTime();
+                that.returnEquip.romId =null;
+                let data = that.returnEquip;
+                that
+                    .$http(url, '', data, 'post')
+                    .then(res => {
+                        console.log(res)
+                        if(res.data.retCode === 0) {
+                            that.$Message.success('回收设备成功！');
+                            this.getDevList();
+                        } else {
+                            that.$Message.error(res.data.retMsg);
                         }
                     })
                     .catch(err => {

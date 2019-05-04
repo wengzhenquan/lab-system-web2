@@ -37,6 +37,9 @@
                     <FormItem label="设备编号：" >
                         <Input v-model="equipment.serNumb" style="width:200px"></Input>
                     </FormItem>
+                    <FormItem label="设备名称：" >
+                        <Input v-model="equipment.eqName" style="width:200px"></Input>
+                    </FormItem>
                     <FormItem label="设备类型：">
                         <Select v-model="equipment.eqClassId" style="width:200px">
                             <Option v-for="item in devSortList" :value="item.value" :key="item.value">{{ item.label }}</Option>
@@ -105,6 +108,7 @@
     export default {
         data() {
             return {
+                level: null,
                 current: 1,
                 pageNo: 1, pageNo1: 1,pageNo2:1,
                 total: 0,
@@ -142,6 +146,7 @@
                 selectLab: [],
                 equipment: {
                     serNumb: '',      //设备编号
+                    eqName: '',
                     eqClassId: null,  //类别
                     romId: null,      //分配教室
                     state: parseInt(this.state),         //设备状态 0-正常 1-保修  2-报废
@@ -152,14 +157,15 @@
                 equipmentId: null,
                 columns4: [
                     {
-                        title: '设备名称',
-                        key: 'eqName',
-                        align: 'center'
-                    },
-                    {
                         title: '编号',
                         key: 'serNumb',
                         align: 'center',
+                    },
+                    {
+                        title: '设备名称',
+                        key: 'eqName',
+                        align: 'center',
+                        width: 100
                     },
                     {
                         title: '类别',
@@ -261,6 +267,7 @@
             this.getDevSortList();    //获取设备类型列表
             this.getDevList();
             this.getLabList();
+            this.level = parseInt(this.Cookies.get('access'));
         },
 
         methods: {

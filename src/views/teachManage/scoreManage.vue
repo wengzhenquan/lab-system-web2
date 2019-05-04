@@ -1,6 +1,6 @@
 <template>
   <div class="box">
-    <div class="search-title">
+    <div class="search-title" style="margin-bottom: 10px">
       <div>
         <div>
           <p>课程名称：</p>
@@ -18,10 +18,12 @@
     <Table border :columns="columns" :data="achieveList" v-if="level === 1"></Table>
     <Table border :columns="columnsS" :data="achieveList" v-if="level === 3"></Table>
     <div style="margin-top: 20px; display: flex;justify-content: space-between">
-      <div v-if="level === 1">
-        <Button type="primary" @click="allAchieve">一键评分</Button>
-        <Button type="success" @click="choiceAchieveList">刷新</Button>
-        <p style="color: red;margin-top: 5px">(计算公式：同课程的所有实验报告的平局成绩%  *  课程总分)</p>
+      <div>
+        <div v-if="level === 1">
+          <Button type="primary" @click="allAchieve">一键评分</Button>
+          <Button type="success" @click="choiceAchieveList">刷新</Button>
+          <p style="color: red;margin-top: 5px">(计算公式：同课程的所有实验报告的平局成绩%  *  课程总分)</p>
+        </div>
       </div>
       <Page :total="total" :key="total" :current.sync="current" @on-change="pageChange" />
     </div>
@@ -55,6 +57,11 @@
         courceList: [],
         courList:[],        //此用户（教师）开设的课程列表
         columnsS: [
+            {
+                title: '序号',
+                type: 'index',
+                align: 'center',
+            },
           {
             title: '课程名',
             key: 'courseName'
@@ -68,26 +75,30 @@
             key: 'totalScore'
           },
           {
-            title: '得分',
+            title: '最终成绩',
             key: 'achieve'
           },
         ],
         columns: [
           {
             title: '课程名',
-            key: 'courseName'
+            key: 'courseName',
+            align: 'center',
           },
           {
             title: '学生',
             key: 'studentName',
+              align: 'center',
           },
           {
             title: '总学分',
-            key: 'totalScore'
+            key: 'totalScore',
+              align: 'center',
           },
           {
             title: '课程得分',
-            key: 'achieve'
+            key: 'achieve',
+              align: 'center',
           },
           {
             title: '操作',
@@ -146,7 +157,18 @@
     created() {
       this.level = parseInt(this.Cookies.get('access'));
       this.loginInfo = JSON.parse(localStorage.getItem('loginInfo'));
-      this.getCourceList();
+      if(this.level === 3) {
+          this.getAchieveList();
+          this.pageNo1 = 1;
+          this.courceList = [];
+          this.courList = [];
+          this.getMyCourceList();
+      } else {
+          this.pageNo1 = 1;
+          this.courceList = [];
+          this.courList = [];
+          this.getCourceList();
+      }
     },
 
     methods: {
@@ -260,6 +282,44 @@
             that.$Message.error('请求错误');
           })
       },
+
+      //获取学生已选课程列表
+      getMyCourceList() {
+            let that = this;
+            let url = that.BaseConfig + '/selectCourseAllBy';
+            let params = {
+                studentId: that.loginInfo.userId,
+                pageNo: that.pageNo1,
+                pageSize: 10,
+            };
+            let data = null;
+            that
+                .$http(url, params, data, 'get')
+                .then(res => {
+                    data = res.data;
+                    if(data.retCode === 0) {
+                        that.courceList = data.data.data;
+                        let total = data.data.total;
+                        if(that.courceList.length < total) {
+                            that.pageNo1++;
+                            that.getMyCourceList();
+                        } else {
+                            that.courceList.map(item=> {
+                                that.courList.push({
+                                    value: item.id,
+                                    label: item.courseName
+                                })
+                            });
+                        }
+
+                    } else {
+                        that.$Message.error(data.retMsg);
+                    }
+                })
+                .catch(err => {
+                    that.$Message.error('请求错误');
+                })
+        },
 
       //智能评分
       autoCommit() {

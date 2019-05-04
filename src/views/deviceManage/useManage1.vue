@@ -163,9 +163,15 @@
                         align: 'center',
                     },
                     {
+                        title: '设备名称',
+                        key: 'eqName',
+                        align: 'center'
+                    },
+                    {
                         title: '状态',
                         key: 'state',
                         align: 'center',
+                        width: 80,
                         render: (h,params)=> {
                             return h('p',params.row.state === 0 ? '正常': (params.row.state === 1 ? '报修':'报废'))
                         }
@@ -192,6 +198,7 @@
                         title: '操作',
                         key: 'action',
                         align: 'center',
+                        width: 180,
                         render: (h, params) => {
                             return h('div', [
                                 h('Button', {
