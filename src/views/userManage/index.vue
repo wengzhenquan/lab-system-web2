@@ -79,6 +79,20 @@
                 </Form>
             </div>
         </Modal>
+
+        <!--强制修改密码-->
+        <Modal
+                v-model="isEditPwd"
+                title="密码重置"
+                @on-ok="updatePwd">
+            <div>
+                <div style="display:flex;">
+                    <span style="display:inline-block;line-height:30px">新密码：</span>
+                    <Input v-model="newPwd" placeholder="输入新密码" style="width: 250px;margin-right: 20px"></Input>
+
+                </div>
+            </div>
+        </Modal>
     </div>
 </template>
 
@@ -126,6 +140,8 @@
                 pageNo: 1,
                 total:0,
                 name: '',
+                isEditPwd: false,
+                newPwd: '',
                 current: 1,
                 userInfo: [],    //用户列表,配合接口请求时，为了搭配分页使用要有两个动态参数pageNum,pageNo，条数与页数。
                 isAddUser: false,
@@ -197,6 +213,22 @@
                                         }
                                     }
                                 }, '编辑'),
+                                h('Button', {
+                                    props: {
+                                        type: 'success',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.isEditPwd = true;
+                                            this.userId = params.row.userId;
+                                            this.newPwd = params.row.newPwd;
+                                        }
+                                    }
+                                }, '重置密码'),
                                 h('Button', {
                                     props: {
                                         type: 'error',
@@ -389,6 +421,28 @@
             handleReset (name) {
                 this.$refs[name].resetFields();
                 this.isAddUser = false;
+            },
+
+            //强制修改密码
+            updatePwd() {
+                let that = this;
+                let url = that.BaseConfig + '/updatePwdById';
+                let params = {
+                    userId: that.userId,
+                    pwd: that.newPwd,
+                };
+                let data = null;
+                that
+                    .$http(url, params, data, 'get')
+                    .then(res => {
+                        if(res.data.retCode === 0) {
+                            that.$Message.success('修改成功');
+                            that.getInfo();
+                        }
+                    })
+                    .catch(err => {
+                        that.$Message.error('请求错误');
+                    })
             },
 
             //删除用户

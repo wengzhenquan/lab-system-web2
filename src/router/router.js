@@ -120,7 +120,7 @@ export const appRouter = [
                 access: 0,
                 component: () => import("@/views/userManage/index")
             },
-            {
+            /*{
                 path: "editPassword",
                 icon: "i iconfont icon-guanli",
                 title: "强制修改用户密码",
@@ -128,7 +128,7 @@ export const appRouter = [
                 access: 0,
                 component: () => import("@/views/userManage/editPassword")
             },
-            {
+            */{
                 path: "pemissionManage",
                 icon: "i iconfont icon-guanli",
                 title: "身份与权限",
